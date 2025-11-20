@@ -1,153 +1,296 @@
-<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>QEMU-KVM虚拟化技术 | 5Y2z_blog</title><meta name="author" content="5Y2z"><meta name="copyright" content="5Y2z"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="虚拟化技术概述 虚拟化是一个广义的术语，在计算机方面通常是指计算元件在虚拟的基础上而不是真实的基础上运行（对计算机物理资源的抽象，实现资源的模拟、隔离和共享）。虚拟化技术可以使得一台计算机上原本只能够一台计算机使用的硬件设备能够同时运行多个逻辑计算机，每个逻辑计算机可运行不同的操作系统，并且应用程序都可以在相互独立的空间内运行而互不影响，从而显著提高计算机的工作效率。 在实际的生产环境中，虚拟化技">
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="https://i.postimg.cc/SsrHG3pr/preview.jpg">
+  <link rel="icon" href="https://i.postimg.cc/SsrHG3pr/preview.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="5Y2z">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="能不能直接把知识塞到我脑子里？">
 <meta property="og:type" content="article">
 <meta property="og:title" content="QEMU-KVM虚拟化技术">
 <meta property="og:url" content="http://yzsandw.com/2025/02/14/QEMU-KVM%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/index.html">
 <meta property="og:site_name" content="5Y2z_blog">
-<meta property="og:description" content="虚拟化技术概述 虚拟化是一个广义的术语，在计算机方面通常是指计算元件在虚拟的基础上而不是真实的基础上运行（对计算机物理资源的抽象，实现资源的模拟、隔离和共享）。虚拟化技术可以使得一台计算机上原本只能够一台计算机使用的硬件设备能够同时运行多个逻辑计算机，每个逻辑计算机可运行不同的操作系统，并且应用程序都可以在相互独立的空间内运行而互不影响，从而显著提高计算机的工作效率。 在实际的生产环境中，虚拟化技">
+<meta property="og:description" content="能不能直接把知识塞到我脑子里？">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/QEMU-KVM%E5%AD%A6%E4%B9%A0.png">
 <meta property="article:published_time" content="2025-02-14T06:42:18.000Z">
-<meta property="article:modified_time" content="2025-02-28T02:54:04.000Z">
+<meta property="article:modified_time" content="2025-11-20T08:05:55.242Z">
 <meta property="article:author" content="5Y2z">
 <meta property="article:tag" content="虚拟化技术">
 <meta property="article:tag" content="硬件辅助虚拟化">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/QEMU-KVM%E5%AD%A6%E4%B9%A0.png"><link rel="shortcut icon" href="https://i.postimg.cc/SsrHG3pr/preview.jpg"><link rel="canonical" href="http://yzsandw.com/2025/02/14/QEMU-KVM%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
-    (() => {
-      
-    const saveToLocal = {
-      set: (key, value, ttl) => {
-        if (!ttl) return
-        const expiry = Date.now() + ttl * 86400000
-        localStorage.setItem(key, JSON.stringify({ value, expiry }))
-      },
-      get: key => {
-        const itemStr = localStorage.getItem(key)
-        if (!itemStr) return undefined
-        const { value, expiry } = JSON.parse(itemStr)
-        if (Date.now() > expiry) {
-          localStorage.removeItem(key)
-          return undefined
-        }
-        return value
-      }
-    }
-
-    window.btf = {
-      saveToLocal,
-      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
-        const script = document.createElement('script')
-        script.src = url
-        script.async = true
-        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
-        script.onload = script.onreadystatechange = () => {
-          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
-        }
-        script.onerror = reject
-        document.head.appendChild(script)
-      }),
-      getCSS: (url, id) => new Promise((resolve, reject) => {
-        const link = document.createElement('link')
-        link.rel = 'stylesheet'
-        link.href = url
-        if (id) link.id = id
-        link.onload = link.onreadystatechange = () => {
-          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
-        }
-        link.onerror = reject
-        document.head.appendChild(link)
-      }),
-      addGlobalFn: (key, fn, name = false, parent = window) => {
-        if (!false && key.startsWith('pjax')) return
-        const globalFn = parent.globalFn || {}
-        globalFn[key] = globalFn[key] || {}
-        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
-        parent.globalFn = globalFn
-      }
-    }
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/QEMU-KVM%E5%AD%A6%E4%B9%A0.png">
   
-      
-      const activateDarkMode = () => {
-        document.documentElement.setAttribute('data-theme', 'dark')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
-        }
-      }
-      const activateLightMode = () => {
-        document.documentElement.setAttribute('data-theme', 'light')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
-        }
-      }
+  
+  
+  <title>QEMU-KVM虚拟化技术 - 5Y2z_blog</title>
 
-      btf.activateDarkMode = activateDarkMode
-      btf.activateLightMode = activateLightMode
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
-      const theme = saveToLocal.get('theme')
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yzsandw.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2023-6-11","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
     
-          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>5Y2z_blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
         
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/img1.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="QEMU-KVM虚拟化技术"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-02-14 14:42" pubdate>
+          2025年2月14日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          46 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
       
-      const asideStatus = saveToLocal.get('aside-status')
-      if (asideStatus !== undefined) {
-        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
-      }
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
     
       
-    const detectApple = () => {
-      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
-        document.documentElement.classList.add('apple')
-      }
-    }
-    detectApple()
-  
-    })()
-  </script><script>const GLOBAL_CONFIG = {
-  root: '/',
-  algolia: undefined,
-  localSearch: undefined,
-  translate: {"defaultEncoding":1,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
-  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":300,"highlightFullpage":false,"highlightMacStyle":true},
-  copy: {
-    success: '复制成功',
-    error: '复制失败',
-    noSupport: '浏览器不支持'
-  },
-  relativeDate: {
-    homepage: false,
-    post: false
-  },
-  runtime: '',
-  dateSuffix: {
-    just: '刚刚',
-    min: '分钟前',
-    hour: '小时前',
-    day: '天前',
-    month: '个月前'
-  },
-  copyright: undefined,
-  lightbox: 'null',
-  Snackbar: undefined,
-  infinitegrid: {
-    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
-    buttonText: '加载更多'
-  },
-  isPhotoFigcaption: false,
-  islazyload: false,
-  isAnchor: false,
-  percent: {
-    toc: true,
-    rightside: false,
-  },
-  autoDarkmode: false
-}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
-  title: 'QEMU-KVM虚拟化技术',
-  isPost: true,
-  isHome: false,
-  isHighlightShrink: false,
-  isToc: true,
-  isShuoshuo: false
-}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(url(/img/background1.webp));"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="https://i.postimg.cc/SsrHG3pr/preview.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">30</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/QEMU-KVM学习.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">5Y2z_blog</span></a><a class="nav-page-title" href="/"><span class="site-name">QEMU-KVM虚拟化技术</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">QEMU-KVM虚拟化技术</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-02-14T06:42:18.000Z" title="发表于 2025-02-14 14:42:18">2025-02-14</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-02-28T02:54:04.000Z" title="更新于 2025-02-28 10:54:04">2025-02-28</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="虚拟化技术概述">虚拟化技术概述</h1>
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">QEMU-KVM虚拟化技术</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="虚拟化技术概述">虚拟化技术概述</h1>
 <p>虚拟化是一个广义的术语，在计算机方面通常是指计算元件在虚拟的基础上而不是真实的基础上运行（<strong>对计算机物理资源的抽象，实现资源的模拟、隔离和共享</strong>）。虚拟化技术可以使得一台计算机上原本只能够一台计算机使用的硬件设备能够同时运行多个逻辑计算机，每个逻辑计算机可运行不同的操作系统，并且应用程序都可以在相互独立的空间内运行而互不影响，从而显著提高计算机的工作效率。</p>
 <p>在实际的生产环境中，虚拟化技术主要用来解决高性能的物理硬件产能过剩和老的、旧的硬件产能过低的重组、重用，透明化底层物理硬件，从而最大化的利用物理硬件，对资源充分利用。</p>
 <p>我们将此虚拟的环境称之为VM（Virtual Machine）。安装在这个环境之上的系统我们称为<strong>Guest OS</strong>（客户系统）；运行VMM的操作系统则称<strong>Host OS</strong>（本地操作系统）。</p>
@@ -155,20 +298,20 @@
 <p>分区：在整个物理服务器上运行多个虚拟机；隔离：在同一服务器上的虚拟机相互隔离；封装：整个虚拟机都保存在文件中，可以通过移动文件的方式迁移；相对硬件独立：无需修改任何服务上运行的虚拟机；</p>
 <h1 id="虚拟化分类">虚拟化分类</h1>
 <p>从虚拟化的实现方式来看，虚拟化架构主要有三种形式：寄居虚拟化架构、裸金属虚拟化架构和操作系统虚拟化架构。</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/%E8%99%9A%E6%8B%9F%E5%8C%96%E6%9E%B6%E6%9E%84%E5%88%86%E7%B1%BB.png" alt="虚拟化架构分类"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/%E8%99%9A%E6%8B%9F%E5%8C%96%E6%9E%B6%E6%9E%84%E5%88%86%E7%B1%BB.png" srcset="/img/loading.gif" lazyload alt="虚拟化架构分类"></p>
 <p>以虚拟化技术维度，主要有：全虚拟化、半虚拟化、硬盘辅助虚拟化。</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF%E5%88%86%E7%B1%BB.png" alt="虚拟化技术分类"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF%E5%88%86%E7%B1%BB.png" srcset="/img/loading.gif" lazyload alt="虚拟化技术分类"></p>
 <h1 id="虚拟化架构">虚拟化架构</h1>
 <h2 id="裸金属虚拟化-Type1">裸金属虚拟化(Type1)</h2>
 <p>裸机虚拟化指的是，<strong>Hypervisor 直接运行在硬件上，即以 Hypervisor 作为 Host OS 直接管控硬件资源</strong>。例如 <code>VMware ESXI</code> 便是采用此种架构的 Hypervisor。虚拟机有指令要执行时，Hypervisor会接管该指令，模拟相应的操作。</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/%E8%A3%B8%E9%87%91%E5%B1%9E%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF.png" alt="裸金属虚拟化技术"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/%E8%A3%B8%E9%87%91%E5%B1%9E%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF.png" srcset="/img/loading.gif" lazyload alt="裸金属虚拟化技术"></p>
 <h2 id="宿主机虚拟化-Type2">宿主机虚拟化(Type2)</h2>
 <p>宿主机虚拟化，也叫寄居虚拟化。在一个完整的计算机系统中，最底层是物理硬件，物理硬件之上是操作系统，操作系统之上是各类软件和进程。寄居虚拟化便是在主机操作系统之上安装Hypervisor，也叫VMM(Virtual Machine Monitor,虚拟机管理层)，再往上便是虚拟化软件所创建的虚拟户了。</p>
 <p>宿主机虚拟化实现方式是直接安装和运行应用程序即可，便于实现。但是因其主要依托主机操作系统对设备的支持，性能损耗较大。典型的产品为VMware Workstations。</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/%E5%AF%84%E5%B1%85%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF.png" alt="寄居虚拟化技术"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/%E5%AF%84%E5%B1%85%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF.png" srcset="/img/loading.gif" lazyload alt="寄居虚拟化技术"></p>
 <h2 id="操作系统虚拟化-容器">操作系统虚拟化(容器)</h2>
 <p>隔离性差，最后一种不常用，虚拟机运行在传统操作系统上，创建一个独立的虚拟化实例（容器Container），指向底层托管操作系统，缺点是操作系统唯一，如果底层操作系统跑的是Windows，那么VPS/VE就都得跑Windows。</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%99%9A%E6%8B%9F%E5%8C%96%E6%9E%B6%E6%9E%84.png" alt="操作系统虚拟化架构"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%99%9A%E6%8B%9F%E5%8C%96%E6%9E%B6%E6%9E%84.png" srcset="/img/loading.gif" lazyload alt="操作系统虚拟化架构"></p>
 <blockquote>
 <p>在宿主架构中的虚拟机作为主机操作系统的一个进程来调度和管理，裸金属架构下则不存在主机操作系统，它是以Hypervisor直接运行在物理硬件之上，即使是有类似主机操作系统的父分区或Domain 0，也是作为裸金属架构下的虚拟机存在的。宿主架构通常用于个人PC上的虚拟化，如WindowsVirtual PC，VMware Workstation，Virtual Box，Qemu等，而裸金属架构通常用于服务器的虚拟化。</p>
 </blockquote>
@@ -189,7 +332,7 @@
 <p><strong>Ring3被称为用户态</strong>，一般应用软件的正常操作均在此。由于ring 3无法访问CPU或内存，因此涉及这些的任何指令都必须传递给ring 0。</p>
 </li>
 </ul>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20250215163603266.png" alt="image-20250215163603266"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20250215163603266.png" srcset="/img/loading.gif" lazyload alt="image-20250215163603266"></p>
 <p>当程序运行在用户模式（Ring 3）时，如果需要<strong>执行一个需要更高权限的指令</strong>，比如直接访问硬件设备，它会触发一个陷阱（trap），操作系统会捕获这个陷阱并决定是否允许该操作。如果允许，<strong>操作系统会将CPU切换到更高的特权级别（如Ring 0或1）来执行该指令</strong>。</p>
 <p>但在虚拟化环境中，<strong>这种特权级别的切换会变得更加复杂</strong>。虚拟机监控器（Hypervisor/VMM）需要拦截客户操作系统（Guest OS）发出的敏感指令，<strong>即使该指令在客户机中看似运行在特权级别（如Ring 0）</strong>。由于虚拟化层对硬件资源的绝对控制，客户操作系统的&quot;Ring 0&quot;实际上是经过虚拟化的非特权模式。此时，Hypervisor会通过<strong>陷入再模拟（Trap-and-Emulate）机制</strong>或借助<strong>硬件虚拟化扩展（如Intel VT-x/AMD-V）</strong>，在真正的物理特权级别（如VMX root模式）下模拟该指令的执行，同时确保虚拟化环境的隔离性和安全性。</p>
 <h2 id="特权指令与敏感指令">特权指令与敏感指令</h2>
@@ -211,17 +354,17 @@
 <h2 id="全虚拟化">全虚拟化</h2>
 <p>也称为原始虚拟化技术，运行在虚拟机上的操作系统通过Hypervisor来最终分享硬件，所以虚拟机发出的指令需经过Hypervisor捕获并处理。</p>
 <p>这是VMware提出的解决方案： BT, Binary Translation 二进制翻译技术, 即将<strong>所有特权指令</strong>通过VMM翻译之后传出, 最后再把结果传回给虚拟机。通过这样的方式, 就成功的欺骗了虚拟机, 让它以为自己在 0 环，即虚拟机不知道自己是虚拟机。如图所示。</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/%E5%85%A8%E8%99%9A%E6%8B%9F%E5%8C%96.png" alt="全虚拟化"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/%E5%85%A8%E8%99%9A%E6%8B%9F%E5%8C%96.png" srcset="/img/loading.gif" lazyload alt="全虚拟化"></p>
 <p>全虚拟化技术不需要修改客户操作系统，因此具有很好的兼容性和可移植性。但这个方式有个问题，所有的指令都需要VMM进行翻译，性能折扣太高了。</p>
 <h2 id="半虚拟化">半虚拟化</h2>
 <p>思想：将整个<code>Guest OS</code>运行在非特权模式下，遇到敏感指令中的特权指令，可以通过陷入到vmm进行模拟执行。但有些敏感指令不是特权指令，半虚拟化的核心就是将<code>Guest OS</code>中的此类指令全部修改了，通过hypercall直接和vmm通信,从而达到陷入再模拟的效果，<strong>修改操作系统内核来将不可虚拟化的指令替换为hypercalls，在这种情况下虚拟机知道自己是虚拟机</strong>。</p>
 <p>半虚拟化不支持未经修改的操作系统(如Windows 2000/XP)，因此它的兼容性和可移植性较差。</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/%E5%8D%8A%E8%99%9A%E6%8B%9F%E5%8C%96.png" alt="半虚拟化"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/%E5%8D%8A%E8%99%9A%E6%8B%9F%E5%8C%96.png" srcset="/img/loading.gif" lazyload alt="半虚拟化"></p>
 <p>半虚拟实际运行时，要实现定制化的功能，首先要了解 API 的特性，并围绕 API 定制对应的功能，才能在已改变内核的操作系统中实现。</p>
 <p>开源的Xen项目是半虚拟化的一个例子，它使用一个经过修改的Linux内核来虚拟化处理器，而用另外一个定制的虚拟机系统的设备驱动来虚拟化I/O。它通过Domain0进行敏感指令的操作。</p>
 <h2 id="硬件辅助虚拟化">硬件辅助虚拟化</h2>
 <p>虚拟化的核心就是如何保证<code>Guest OS</code>可以正确的执行敏感指令又不破坏vmm，x86 cpu当前的运行级别无法满足要求，所以只能从软件上弥补，但性能上终归差点意思。硬件开发厂商提供了新的方法，给cpu薪资一种模式客户机模式（non-root模式）原先的模式称为root模式，每种模式拥有ring0~ring3。引入两种模式之后，前面讨论的非特权指令的敏感指令在non-root模式下可以重新定义。root模式下表现和原先一样 ，这样就完美的解决了虚拟化漏洞的问题。</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/%E7%A1%AC%E4%BB%B6%E8%BE%85%E5%8A%A9%E8%99%9A%E6%8B%9F%E5%8C%96.png" alt="硬件辅助虚拟化"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/%E7%A1%AC%E4%BB%B6%E8%BE%85%E5%8A%A9%E8%99%9A%E6%8B%9F%E5%8C%96.png" srcset="/img/loading.gif" lazyload alt="硬件辅助虚拟化"></p>
 <h1 id="虚拟化对象">虚拟化对象</h1>
 <h2 id="CPU虚拟化">CPU虚拟化</h2>
 <p>目前主要的 CPU 虚拟化技术是 Intel 的 VT-x/VT-i 和 AMD 的 AMD-V 这两种技术。</p>
@@ -299,134 +442,356 @@
 <li><code>VM-Entry</code>：Hypervisor 保存自身状态信息，切换到 VMX Non-Root 模式，载入 VM 状态信息，恢复 VM 执行流。</li>
 <li><code>VM-Exit</code>：VM 运行暂停并保存自身状态信息，切换到 VMX Root 模式，载入 Hypervisor 状态信息，执行相应的处理函数。</li>
 </ul>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/intel-vt-x-mode.png" alt="intel-vt-x-mode"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/intel-vt-x-mode.png" srcset="/img/loading.gif" lazyload alt="intel-vt-x-mode"></p>
 <p>由于 Non-Root 模式与 Root 模式都各自有着自己的分级保护环，因此 Host OS 与 Guest OS 都可以<strong>不加修改地在自己对应的模式下直接在硬件上运行</strong>，仅有当 Guest OS 涉及到敏感资源的访问及 Host OS 对 VM 的调度时才会发生切换，这在确保了 VM 高性能的同时满足了 <code>Trap &amp; Emulate</code> 模型实现，也解决了 x86 架构的虚拟化漏洞。</p>
 <h4 id="VMCS">VMCS</h4>
-</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://yzsandw.com">5Y2z</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://yzsandw.com/2025/02/14/QEMU-KVM%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/">http://yzsandw.com/2025/02/14/QEMU-KVM虚拟化技术/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://yzsandw.com" target="_blank">5Y2z_blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/">虚拟化技术</a><a class="post-meta__tags" href="/tags/%E7%A1%AC%E4%BB%B6%E8%BE%85%E5%8A%A9%E8%99%9A%E6%8B%9F%E5%8C%96/">硬件辅助虚拟化</a></div><div class="post-share"><div class="social-share" data-image="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/QEMU-KVM学习.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/03/27/Windows11%E5%85%B3%E9%97%AD%E2%80%9C%E5%9F%BA%E4%BA%8E%E8%99%9A%E6%8B%9F%E5%8C%96%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E2%80%9D/" title="Windows11关闭“基于虚拟化的安全性”"><img class="cover" src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/Windows11关闭“基于虚拟化的安全性”.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Windows11关闭“基于虚拟化的安全性”</div></div><div class="info-2"><div class="info-item-1">在一次嵌套虚拟化的实验里，笔者忽然发现KVM报错。在查询资料并且在VMWare打开了CPU虚拟化之后悲催的发现出现了一个从来没有见过的错误  如果选择否就直接关闭虚拟机了，选择是就会出现这样的错误  查了一下发现是微软的 Hyper-V 与 VMware Workstation 之间是冲突的，需要关闭Hyper-V。本以为是个很简单的事情，结果笔者的主机是非常稀有的体质，折腾了一下午。故记录一下解决这个问题的时候90%的人都没遇到过的情况（悲）。 以下是关闭Hyper-V的步骤，读者可以依次尝试。 关闭Hyper-V 在开始之前，让我们先查看几个关键的设置。 首先是硬件CPU的虚拟化支持，可以按Ctrl+Shift+Esc打开任务管理器，随后查看性能分组，查看CPU的状态。如图所示CPU虚拟化已启用是正常的，笔者一开始这里就是启用的，所以就没有管，如果未启用请自行搜索资料。  之后是打开计算机...</div></div></div></a><a class="pagination-related" href="/2025/01/08/OpenStack%E5%B9%B3%E5%8F%B0%E6%90%AD%E5%BB%BA/" title="OpenStack平台搭建"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">OpenStack平台搭建</div></div><div class="info-2"><div class="info-item-1">涨了一个大教训，以后如果有官方准备的安装说明文档就再也不看网上的安装教程了。很多步骤的细节都不说明白，导致一直报错，作者也不提醒。 基础环境-主机准备 OpenStack云平台搭建需要两个节点，一个是controller（控制节点），另一个是compute（计算节点）。    名称 IP地址 主机名称 备注     控制节点 192.168.146.150 controller 最小4G,开启虚拟化   计算节点 192.168.146.200 compute1 最小2G,开启虚拟化    controller（控制节点） 主机安装 我没有截图标注的部分直接下一步。              此设置是为了修改网卡命名规则为eth规则   之后按上下箭头选中Install CentOS 7，不要按回车，随后按下tab键。 按下空格，输入如下指令后，按回车键。 1net.ifnames=0...</div></div></div></a></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div><div class="comment-switch"><span class="first-comment">Utterances</span><span id="switch-btn"></span><span class="second-comment">Gitalk</span></div></div><div class="comment-wrap"><div><div id="utterances-wrap"></div></div><div><div id="gitalk-container"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="https://i.postimg.cc/SsrHG3pr/preview.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">5Y2z</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">30</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/yzsandw"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/yzsandw" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292eth;"></i></a><a class="social-icon" href="mailto:yzsandw@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">虚拟化技术概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E5%8C%96%E7%9A%84%E6%9C%AC%E8%B4%A8"><span class="toc-number">2.</span> <span class="toc-text">虚拟化的本质</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E5%8C%96%E5%88%86%E7%B1%BB"><span class="toc-number">3.</span> <span class="toc-text">虚拟化分类</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E5%8C%96%E6%9E%B6%E6%9E%84"><span class="toc-number">4.</span> <span class="toc-text">虚拟化架构</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A3%B8%E9%87%91%E5%B1%9E%E8%99%9A%E6%8B%9F%E5%8C%96-Type1"><span class="toc-number">4.1.</span> <span class="toc-text">裸金属虚拟化(Type1)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%BF%E4%B8%BB%E6%9C%BA%E8%99%9A%E6%8B%9F%E5%8C%96-Type2"><span class="toc-number">4.2.</span> <span class="toc-text">宿主机虚拟化(Type2)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%99%9A%E6%8B%9F%E5%8C%96-%E5%AE%B9%E5%99%A8"><span class="toc-number">4.3.</span> <span class="toc-text">操作系统虚拟化(容器)</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF"><span class="toc-number">5.</span> <span class="toc-text">虚拟化技术</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Ring%E7%8E%AF"><span class="toc-number">5.1.</span> <span class="toc-text">Ring环</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%89%B9%E6%9D%83%E6%8C%87%E4%BB%A4%E4%B8%8E%E6%95%8F%E6%84%9F%E6%8C%87%E4%BB%A4"><span class="toc-number">5.2.</span> <span class="toc-text">特权指令与敏感指令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%A8%E8%99%9A%E6%8B%9F%E5%8C%96"><span class="toc-number">5.3.</span> <span class="toc-text">全虚拟化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%8A%E8%99%9A%E6%8B%9F%E5%8C%96"><span class="toc-number">5.4.</span> <span class="toc-text">半虚拟化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A1%AC%E4%BB%B6%E8%BE%85%E5%8A%A9%E8%99%9A%E6%8B%9F%E5%8C%96"><span class="toc-number">5.5.</span> <span class="toc-text">硬件辅助虚拟化</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E5%8C%96%E5%AF%B9%E8%B1%A1"><span class="toc-number">6.</span> <span class="toc-text">虚拟化对象</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#CPU%E8%99%9A%E6%8B%9F%E5%8C%96"><span class="toc-number">6.1.</span> <span class="toc-text">CPU虚拟化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%AF%E8%BD%AF%E4%BB%B6%E5%AE%9E%E7%8E%B0CPU%E8%99%9A%E6%8B%9F%E5%8C%96"><span class="toc-number">6.1.1.</span> <span class="toc-text">纯软件实现CPU虚拟化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A8%A1%E6%8B%9F-%E8%A7%A3%E9%87%8A%E6%89%A7%E8%A1%8C"><span class="toc-number">6.1.1.1.</span> <span class="toc-text">模拟&amp; 解释执行</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%AB%E6%8F%8F-%E4%BF%AE%E8%A1%A5"><span class="toc-number">6.1.1.2.</span> <span class="toc-text">扫描 &amp; 修补</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%BF%BB%E8%AF%91"><span class="toc-number">6.1.1.3.</span> <span class="toc-text">二进制翻译</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A1%AC%E4%BB%B6%E8%BE%85%E5%8A%A9%E8%99%9A%E6%8B%9F%E5%8C%96-2"><span class="toc-number">6.1.2.</span> <span class="toc-text">硬件辅助虚拟化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#VMCS"><span class="toc-number">6.1.2.1.</span> <span class="toc-text">VMCS</span></a></li></ol></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/10/17/%E8%99%9A%E6%8B%9F%E5%8F%AF%E4%BF%A1%E6%A0%B9%E5%AE%9E%E9%AA%8C/" title="虚拟可信根实验"><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/109951168793024714.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="虚拟可信根实验"/></a><div class="content"><a class="title" href="/2025/10/17/%E8%99%9A%E6%8B%9F%E5%8F%AF%E4%BF%A1%E6%A0%B9%E5%AE%9E%E9%AA%8C/" title="虚拟可信根实验">虚拟可信根实验</a><time datetime="2025-10-17T07:36:44.000Z" title="发表于 2025-10-17 15:36:44">2025-10-17</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/08/25/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%9A%84Kernel-Pwn%E5%85%A5%E9%97%A8/" title="直博自救，从零开始的Kernel Pwn入门">直博自救，从零开始的Kernel Pwn入门</a><time datetime="2025-08-25T06:26:27.000Z" title="发表于 2025-08-25 14:26:27">2025-08-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/07/09/%E7%AE%80%E5%8D%95%E4%BA%86%E8%A7%A3PCI%E6%80%BB%E7%BA%BF/" title="简单了解PCI总线"><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/fe48cc7f9c7faaf513b78a0bb6c239e.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="简单了解PCI总线"/></a><div class="content"><a class="title" href="/2025/07/09/%E7%AE%80%E5%8D%95%E4%BA%86%E8%A7%A3PCI%E6%80%BB%E7%BA%BF/" title="简单了解PCI总线">简单了解PCI总线</a><time datetime="2025-07-09T03:06:04.000Z" title="发表于 2025-07-09 11:06:04">2025-07-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/05/14/pwn%E5%81%9A%E9%A2%98%E8%AE%B0%E5%BD%95/" title="pwn做题记录"><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/pwn记录.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="pwn做题记录"/></a><div class="content"><a class="title" href="/2025/05/14/pwn%E5%81%9A%E9%A2%98%E8%AE%B0%E5%BD%95/" title="pwn做题记录">pwn做题记录</a><time datetime="2025-05-14T06:42:45.000Z" title="发表于 2025-05-14 14:42:45">2025-05-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/03/27/Windows11%E5%85%B3%E9%97%AD%E2%80%9C%E5%9F%BA%E4%BA%8E%E8%99%9A%E6%8B%9F%E5%8C%96%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E2%80%9D/" title="Windows11关闭“基于虚拟化的安全性”"><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/Windows11关闭“基于虚拟化的安全性”.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Windows11关闭“基于虚拟化的安全性”"/></a><div class="content"><a class="title" href="/2025/03/27/Windows11%E5%85%B3%E9%97%AD%E2%80%9C%E5%9F%BA%E4%BA%8E%E8%99%9A%E6%8B%9F%E5%8C%96%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E2%80%9D/" title="Windows11关闭“基于虚拟化的安全性”">Windows11关闭“基于虚拟化的安全性”</a><time datetime="2025-03-27T08:49:34.000Z" title="发表于 2025-03-27 16:49:34">2025-03-27</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/QEMU-KVM学习.png);"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By 5Y2z</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><div class="js-pjax"><script>(async () => {
-  const showKatex = () => {
-    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
-  }
 
-  if (!window.katex_js_css) {
-    window.katex_js_css = true
-    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css')
-    if (true) {
-      await btf.getScript('https://cdn.jsdelivr.net/npm/katex/dist/contrib/copy-tex.min.js')
-    }
-  }
-
-  showKatex()
-})()</script><script>(() => {
-  const isShuoshuo = GLOBAL_CONFIG_SITE.isShuoshuo
-  const option = null
-  const getUtterancesTheme = theme => theme === 'dark' ? 'photon-dark' : 'github-light'
-
-  const loadUtterances = (el = document, key) => {
-    if (isShuoshuo) {
-      window.shuoshuoComment.destroyUtterances = () => {
-        if (el.children.length) {
-          el.innerHTML = ''
-          el.classList.add('no-comment')
-        }
-      }
-    }
-
-    const config = {
-      src: 'https://utteranc.es/client.js',
-      repo: 'yzsandw/yzsandw.github.io',
-      theme: getUtterancesTheme(document.documentElement.getAttribute('data-theme')),
-      crossorigin: 'anonymous',
-      async: true,
-      ...option,
-      'issue-term': isShuoshuo ? key : (option && option['issue-term']) || 'pathname'
-    }
-
-    const ele = document.createElement('script')
-    Object.entries(config).forEach(([key, value]) => ele.setAttribute(key, value))
-    el.querySelector('#utterances-wrap').appendChild(ele)
-  }
-
-  const changeUtterancesTheme = theme => {
-    const iframe = document.querySelector('#utterances-wrap iframe')
-    if (iframe) {
-      const message = {
-        type: 'set-theme',
-        theme: getUtterancesTheme(theme)
-      };
-      iframe.contentWindow.postMessage(message, 'https://utteranc.es')
-    }
-  }
-
-  btf.addGlobalFn('themeChange', changeUtterancesTheme, 'utterances')
-
-  if (isShuoshuo) {
-    'Utterances' === 'Utterances'
-      ? window.shuoshuoComment = { loadComment: loadUtterances }
-      : window.loadOtherComment = loadUtterances
-    return
-  }
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
   
-  if ('Utterances' === 'Utterances' || !false) {
-    if (false) btf.loadComment(document.getElementById('utterances-wrap'), loadUtterances)
-    else loadUtterances()
-  } else {
-    window.loadOtherComment = loadUtterances
-  }
-})()</script><script>(() => {
-  const isShuoshuo = GLOBAL_CONFIG_SITE.isShuoshuo
-  const option = null
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/" class="print-no-link">#虚拟化技术</a>
+      
+        <a href="/tags/%E7%A1%AC%E4%BB%B6%E8%BE%85%E5%8A%A9%E8%99%9A%E6%8B%9F%E5%8C%96/" class="print-no-link">#硬件辅助虚拟化</a>
+      
+    </div>
+  
+</div>
 
-  const commentCount = n => {
-    const isCommentCount = document.querySelector('#post-meta .gitalk-comment-count')
-    if (isCommentCount) {
-      isCommentCount.textContent= n
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>QEMU-KVM虚拟化技术</div>
+      <div>http://yzsandw.com/2025/02/14/QEMU-KVM虚拟化技术/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>5Y2z</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年2月14日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/03/27/Windows11%E5%85%B3%E9%97%AD%E2%80%9C%E5%9F%BA%E4%BA%8E%E8%99%9A%E6%8B%9F%E5%8C%96%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E2%80%9D/" title="Windows11关闭“基于虚拟化的安全性”">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Windows11关闭“基于虚拟化的安全性”</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/01/08/OpenStack%E5%B9%B3%E5%8F%B0%E6%90%AD%E5%BB%BA/" title="OpenStack平台搭建">
+                        <span class="hidden-mobile">OpenStack平台搭建</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
     }
-  }
 
-  const initGitalk = (el, path) => {
-    if (isShuoshuo) {
-      window.shuoshuoComment.destroyGitalk = () => {
-        if (el.children.length) {
-          el.innerHTML = ''
-          el.classList.add('no-comment')
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
         }
       }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
     }
-
-    const gitalk = new Gitalk({
-      clientID: '28dd598981c595459952',
-      clientSecret: 'a82c85f8b3575c923e14858ab7ec81325055d1ae',
-      repo: 'yzsandw.github.io',
-      owner: 'yzsandw',
-      admin: ['yzsandw'],
-      updateCountCallback: commentCount,
-      ...option,
-      id: isShuoshuo ? path : (option && option.id) || 'c26a5f857ed0cb67fbfdbaf1640f19de'
-    })
-
-    gitalk.render('gitalk-container')
-  }
-
-  const loadGitalk = async(el, path) => {
-    if (typeof Gitalk === 'function') initGitalk(el, path)
-    else {
-      await btf.getCSS('https://cdn.jsdelivr.net/npm/gitalk/dist/gitalk.min.css')
-      await btf.getScript('https://cdn.jsdelivr.net/npm/gitalk/dist/gitalk.min.js')
-      initGitalk(el, path)
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
     }
-  }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
 
-  if (isShuoshuo) {
-    'Utterances' === 'Gitalk'
-      ? window.shuoshuoComment = { loadComment: loadGitalk }
-      : window.loadOtherComment = loadGitalk
-    return
-  }
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
 
-  if ('Utterances' === 'Gitalk' || !false) {
-    if (false) btf.loadComment(document.getElementById('gitalk-container'), loadGitalk)
-    else loadGitalk()
-  } else {
-    window.loadOtherComment = loadGitalk
-  }
-})()</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,4 +1,25 @@
-<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>虚拟可信根实验 | 5Y2z_blog</title><meta name="author" content="5Y2z"><meta name="copyright" content="5Y2z"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="swtpm vTCM 新建一个项目根目录，我的项目根目录为&#x2F;opt&#x2F;build_vtcm&#x2F;vtcm。 先把cube-1.3、cube-tcm和gm_sm2_master克隆到项目根目录 123git clone https:&#x2F;&#x2F;gitee.com&#x2F;biparadox&#x2F;cube-1.3.gitgit clone https:&#x2F;&#x2F;gitee.com&#x2F;biparadox&#x2F;cube-tcm.gitgit">
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="https://i.postimg.cc/SsrHG3pr/preview.jpg">
+  <link rel="icon" href="https://i.postimg.cc/SsrHG3pr/preview.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="5Y2z">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="swtpm vTCM 新建一个项目根目录，我的项目根目录为&#x2F;opt&#x2F;build_vtcm&#x2F;vtcm。 先把cube-1.3、cube-tcm和gm_sm2_master克隆到项目根目录 123git clone https:&#x2F;&#x2F;gitee.com&#x2F;biparadox&#x2F;cube-1.3.gitgit clone https:&#x2F;&#x2F;gitee.com&#x2F;biparadox&#x2F;cube-tcm.gitgit">
 <meta property="og:type" content="article">
 <meta property="og:title" content="虚拟可信根实验">
 <meta property="og:url" content="http://yzsandw.com/2025/10/17/%E8%99%9A%E6%8B%9F%E5%8F%AF%E4%BF%A1%E6%A0%B9%E5%AE%9E%E9%AA%8C/index.html">
@@ -7,449 +28,795 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/109951168793024714.jpg">
 <meta property="article:published_time" content="2025-10-17T07:36:44.000Z">
-<meta property="article:modified_time" content="2025-10-17T07:39:06.234Z">
+<meta property="article:modified_time" content="2025-11-20T07:43:13.120Z">
 <meta property="article:author" content="5Y2z">
 <meta property="article:tag" content="vTPM">
 <meta property="article:tag" content="vTCM">
 <meta property="article:tag" content="swtpm">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/109951168793024714.jpg"><link rel="shortcut icon" href="https://i.postimg.cc/SsrHG3pr/preview.jpg"><link rel="canonical" href="http://yzsandw.com/2025/10/17/%E8%99%9A%E6%8B%9F%E5%8F%AF%E4%BF%A1%E6%A0%B9%E5%AE%9E%E9%AA%8C/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
-    (() => {
-      
-    const saveToLocal = {
-      set: (key, value, ttl) => {
-        if (!ttl) return
-        const expiry = Date.now() + ttl * 86400000
-        localStorage.setItem(key, JSON.stringify({ value, expiry }))
-      },
-      get: key => {
-        const itemStr = localStorage.getItem(key)
-        if (!itemStr) return undefined
-        const { value, expiry } = JSON.parse(itemStr)
-        if (Date.now() > expiry) {
-          localStorage.removeItem(key)
-          return undefined
-        }
-        return value
-      }
-    }
-
-    window.btf = {
-      saveToLocal,
-      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
-        const script = document.createElement('script')
-        script.src = url
-        script.async = true
-        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
-        script.onload = script.onreadystatechange = () => {
-          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
-        }
-        script.onerror = reject
-        document.head.appendChild(script)
-      }),
-      getCSS: (url, id) => new Promise((resolve, reject) => {
-        const link = document.createElement('link')
-        link.rel = 'stylesheet'
-        link.href = url
-        if (id) link.id = id
-        link.onload = link.onreadystatechange = () => {
-          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
-        }
-        link.onerror = reject
-        document.head.appendChild(link)
-      }),
-      addGlobalFn: (key, fn, name = false, parent = window) => {
-        if (!false && key.startsWith('pjax')) return
-        const globalFn = parent.globalFn || {}
-        globalFn[key] = globalFn[key] || {}
-        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
-        parent.globalFn = globalFn
-      }
-    }
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/109951168793024714.jpg">
   
-      
-      const activateDarkMode = () => {
-        document.documentElement.setAttribute('data-theme', 'dark')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
-        }
-      }
-      const activateLightMode = () => {
-        document.documentElement.setAttribute('data-theme', 'light')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
-        }
-      }
+  
+  
+  <title>虚拟可信根实验 - 5Y2z_blog</title>
 
-      btf.activateDarkMode = activateDarkMode
-      btf.activateLightMode = activateLightMode
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
-      const theme = saveToLocal.get('theme')
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yzsandw.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2023-6-11","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
     
-          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>5Y2z_blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
         
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/img1.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="虚拟可信根实验"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-10-17 15:36" pubdate>
+          2025年10月17日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          21 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
       
-      const asideStatus = saveToLocal.get('aside-status')
-      if (asideStatus !== undefined) {
-        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
-      }
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
     
       
-    const detectApple = () => {
-      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
-        document.documentElement.classList.add('apple')
-      }
-    }
-    detectApple()
-  
-    })()
-  </script><script>const GLOBAL_CONFIG = {
-  root: '/',
-  algolia: undefined,
-  localSearch: undefined,
-  translate: {"defaultEncoding":1,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
-  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":300,"highlightFullpage":false,"highlightMacStyle":true},
-  copy: {
-    success: '复制成功',
-    error: '复制失败',
-    noSupport: '浏览器不支持'
-  },
-  relativeDate: {
-    homepage: false,
-    post: false
-  },
-  runtime: '',
-  dateSuffix: {
-    just: '刚刚',
-    min: '分钟前',
-    hour: '小时前',
-    day: '天前',
-    month: '个月前'
-  },
-  copyright: undefined,
-  lightbox: 'null',
-  Snackbar: undefined,
-  infinitegrid: {
-    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
-    buttonText: '加载更多'
-  },
-  isPhotoFigcaption: false,
-  islazyload: false,
-  isAnchor: false,
-  percent: {
-    toc: true,
-    rightside: false,
-  },
-  autoDarkmode: false
-}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
-  title: '虚拟可信根实验',
-  isPost: true,
-  isHome: false,
-  isHighlightShrink: false,
-  isToc: true,
-  isShuoshuo: false
-}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(url(/img/background1.webp));"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="https://i.postimg.cc/SsrHG3pr/preview.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">30</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/109951168793024714.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">5Y2z_blog</span></a><a class="nav-page-title" href="/"><span class="site-name">虚拟可信根实验</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">虚拟可信根实验</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-10-17T07:36:44.000Z" title="发表于 2025-10-17 15:36:44">2025-10-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-10-17T07:39:06.234Z" title="更新于 2025-10-17 15:39:06">2025-10-17</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="swtpm">swtpm</h1>
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">虚拟可信根实验</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="swtpm">swtpm</h1>
 <h1 id="vTCM">vTCM</h1>
 <p>新建一个项目根目录，我的项目根目录为/opt/build_vtcm/vtcm。</p>
 <p>先把cube-1.3、cube-tcm和gm_sm2_master克隆到项目根目录</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git clone https://gitee.com/biparadox/cube-1.3.git</span><br><span class="line">git clone https://gitee.com/biparadox/cube-tcm.git</span><br><span class="line">git clone https://github.com/TCLab-BJUT/gm_sm2.git</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">git clone https://gitee.com/biparadox/cube-1.3.git<br>git clone https://gitee.com/biparadox/cube-tcm.git<br>git clone https://github.com/TCLab-BJUT/gm_sm2.git<br></code></pre></td></tr></table></figure>
 <p>根据《tcm工程初步》中所说，cube-tcm 的环境变量设置方法必须在cube-1.3的环境变量设置完成后进行， 设置方法类似，脚本执行后，会修改CUBEAPPPATH和CUBE_APP_PLUGIN 到vtcm-1.12工作目录。编译前需完成国密算法库文件的复制和环境变量的设置。</p>
 <h2 id="国密算法包编译">国密算法包编译</h2>
 <p>进入gm_sm2目录后，执行命令。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd gm_sm2</span><br><span class="line">make</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd gm_sm2<br>make<br></code></pre></td></tr></table></figure>
 <p>观察gm_sm2/bin目录，<a target="_blank" rel="noopener" href="http://xn--libsm2So-nw7mw2bzzhjr5a55ija395c4yjh67gl8b138dkh7c.so">应可看到编译完成的动态库libsm2So.so</a>。此时国密算法包即编译完成。</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241205142843996.png" alt="image-20241205142843996"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241205142843996.png" srcset="/img/loading.gif" lazyload alt="image-20241205142843996"></p>
 <p>下面将该库复制到cube-tcm的本地库目录cube-tcm/locallib/目录下。 cube-tcm 内部模块将会调用该库执行国密算法计算。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp ./bin/libsm2So.so ../cube-tcm/locallib/</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">cp ./bin/libsm2So.so ../cube-tcm/locallib/<br></code></pre></td></tr></table></figure>
 <h2 id="cube-1-3环境变量设置">cube-1.3环境变量设置</h2>
 <p>进入cube-1.3目录，并且完成编译环境配置</p>
 <p>修改set_env.sh</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd ../cube-1.3</span><br><span class="line">vi set_env.sh</span><br></pre></td></tr></table></figure>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241205103400314.png" alt="image-20241205103400314"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd ../cube-1.3<br>vi set_env.sh<br></code></pre></td></tr></table></figure>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241205103400314.png" srcset="/img/loading.gif" lazyload alt="image-20241205103400314"></p>
 <p>将此处修改为你cube-1.3所在路径，比如我的是<code>/opt/build_vtcm/vtcm/cube-1.3</code>，<mark>注意需要去掉`号！！！！</mark></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">编译环境设置</span></span><br><span class="line">source set_env.sh</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">cube架构的编译</span></span><br><span class="line">sh env_build.sh</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">#</span><span class="language-bash">编译环境设置</span><br>source set_env.sh<br><span class="hljs-meta prompt_">#</span><span class="language-bash">cube架构的编译</span><br>sh env_build.sh<br></code></pre></td></tr></table></figure>
 <p>编译爆警告是正常现象，没有报错就行。</p>
 <p>完成编译后，如果以root权限登录，则可以直接运行cube实例；如果是以非root权限登录，应预先执行sudo dmidecode | grep UUID命令，获得uuid值，或自行为机器设置一个32字节的uuid值（可用随机数生成），而后在cube-1.3的proc/plugin目录下编辑一个名为uuid的文件，将UUID值填充到文件中，此时非root用户即可执行cube架构。</p>
 <h2 id="cube-tcm环境变量设置">cube-tcm环境变量设置</h2>
 <p>进入cube-tcm目录下，修改set_env.sh。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd ../cube-tcm</span><br><span class="line">vi set_env.sh</span><br></pre></td></tr></table></figure>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241205111312409.png" alt="image-20241205111312409"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd ../cube-tcm<br>vi set_env.sh<br></code></pre></td></tr></table></figure>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241205111312409.png" srcset="/img/loading.gif" lazyload alt="image-20241205111312409"></p>
 <p>同样的</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">编译环境设置</span></span><br><span class="line">source set_env.sh</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">cube架构的编译</span></span><br><span class="line">sh env_build.sh</span><br></pre></td></tr></table></figure>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241205111507541.png" alt="image-20241205111507541"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">#</span><span class="language-bash">编译环境设置</span><br>source set_env.sh<br><span class="hljs-meta prompt_">#</span><span class="language-bash">cube架构的编译</span><br>sh env_build.sh<br></code></pre></td></tr></table></figure>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241205111507541.png" srcset="/img/loading.gif" lazyload alt="image-20241205111507541"></p>
 <p>如果<code>sh env_build.sh</code>没有报错，那么模拟器编译成功，否则需要检查一下环境变量设置和算法库位置。</p>
 <h2 id="设置-bashrc文件">设置.bashrc文件</h2>
 <p>由于每次启动都得输入<code>source /opt/vtcm/cube-1.3/set_env.sh</code>和<code>source /opt/vtcm/cube-tcm/set_env.sh</code>，非常繁琐。所以我们把上面的命令写入.bashrc文件中，方便每次都自动完成设置。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /root/.bashrc</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">vi /root/.bashrc<br></code></pre></td></tr></table></figure>
 <p>进入.bashrc在最后一行添加</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">source /opt/vtcm/cube-1.3/set_env.sh</span><br><span class="line">source /opt/vtcm/cube-tcm/set_env.sh</span><br></pre></td></tr></table></figure>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241205112905991.png" alt="image-20241205112905991"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">source /opt/vtcm/cube-1.3/set_env.sh<br>source /opt/vtcm/cube-tcm/set_env.sh<br></code></pre></td></tr></table></figure>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241205112905991.png" srcset="/img/loading.gif" lazyload alt="image-20241205112905991"></p>
 <h2 id="cube-tcm编译">cube-tcm编译</h2>
 <p>安装tcm驱动并部署设备</p>
 <p>我们在系统中启动两个终端term1和term2,确认两个终端均已完成环境变量配置。接下来在term1中打开驱动所在目录并执行make。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd ./vtcm/cube-tcm/vtcm_dev</span><br><span class="line">make</span><br><span class="line">sudo ./load_vtcmd_dev.sh</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd ./vtcm/cube-tcm/vtcm_dev<br>make<br>sudo ./load_vtcmd_dev.sh<br></code></pre></td></tr></table></figure>
 <p>执行完毕后可以查看一下/dev中是否已经成功安装tcm设备和vtcm设备。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls /dev/*tcm*</span><br></pre></td></tr></table></figure>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241206172025753.png" alt="image-20241206172025753"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">ls /dev/*tcm*<br></code></pre></td></tr></table></figure>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241206172025753.png" srcset="/img/loading.gif" lazyload alt="image-20241206172025753"></p>
 <p>完成后打开模拟器</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd ../vtcm_netlink_emulator</span><br><span class="line">./main_proc</span><br></pre></td></tr></table></figure>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241206172054961.png" alt="image-20241206172054961"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd ../vtcm_netlink_emulator<br>./main_proc<br></code></pre></td></tr></table></figure>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241206172054961.png" srcset="/img/loading.gif" lazyload alt="image-20241206172054961"></p>
 <p>现在我们再转到term2。在term2的项目根目录中进入vtcm_utils目录。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd ./vtcm/cube-tcm/vtcm_utils</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd ./vtcm/cube-tcm/vtcm_utils<br></code></pre></td></tr></table></figure>
 <p>该目录下是可信根应用实例的运行环境vtcm_utils。一个可信根需要通过与应用层的一个实例间的交互过程，来执行可信根的功能。</p>
 <p>此时在vtcm_utils目录下执行（此处先不要运行）</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./main_proc</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">./main_proc<br></code></pre></td></tr></table></figure>
 <p>即可与vtcm_emulator 互联。</p>
 <h2 id="TCM服务功能与操作实例">TCM服务功能与操作实例</h2>
 <h3 id="初始化">初始化</h3>
 <p>vtcm_utils缺省设为脚本操作，目录下有多个自动化脚本。我们这里使用交互模式来操作。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">grep vtcm_auto *</span><br><span class="line">sed -i &quot;s|vtcm_auto|vtcm_input|&quot; plugin_config.cfg</span><br><span class="line">sed -i &quot;s|vtcm_auto|vtcm_input|&quot; router_policy.cfg</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">grep vtcm_auto *<br>sed -i &quot;s|vtcm_auto|vtcm_input|&quot; plugin_config.cfg<br>sed -i &quot;s|vtcm_auto|vtcm_input|&quot; router_policy.cfg<br></code></pre></td></tr></table></figure>
 <p>将查找到的所有地方替换为vtcm_input，即可转入互动操作模式，如需换回脚本操作模式，则只要再用vtcm_auto替换掉vtcm_input即可。</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241205160235129.png" alt="image-20241205160235129"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241205160235129.png" srcset="/img/loading.gif" lazyload alt="image-20241205160235129"></p>
 <p>此时直接执行</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./main_proc</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">./main_proc<br></code></pre></td></tr></table></figure>
 <p>程序将进入等待命令状态。</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241205160343093.png" alt="image-20241205160343093"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241205160343093.png" srcset="/img/loading.gif" lazyload alt="image-20241205160343093"></p>
 <p>生成背书密钥</p>
 <p>cube-TCM里设置了一条背书密钥命令createek, 命令格式为：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">createek –wf ekpub.key</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">createek –wf ekpub.key<br></code></pre></td></tr></table></figure>
 <p>这里可信根命令的每个参数都由一个<code>-</code>打头的前缀来确定其类型。createek命令创建密钥后，会将密钥导出到ekpub.key文件中，在term2则可看到芯片输入输 出的二进制信息：</p>
 <ul>
 <li>
 <p>输入信息是vtcm_utils根据芯片接口要求生成的数据包，如下所示：</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241206172300574.png" alt="image-20241206172300574"></p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241206161832580.png" alt="image-20241206161832580"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241206172300574.png" srcset="/img/loading.gif" lazyload alt="image-20241206172300574"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241206161832580.png" srcset="/img/loading.gif" lazyload alt="image-20241206161832580"></p>
 </li>
 <li>
 <p>输出信息则为vtcm_emulator收到数据包后，按照tcm标准运行后，返回的数据，如下所示：</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241206161913238.png" alt="image-20241206161913238"></p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241206161926197.png" alt="image-20241206161926197"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241206161913238.png" srcset="/img/loading.gif" lazyload alt="image-20241206161913238"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241206161926197.png" srcset="/img/loading.gif" lazyload alt="image-20241206161926197"></p>
 </li>
 </ul>
 <p>下面执行readpubek指令，该指令无输入参数</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">readpubek</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">readpubek<br></code></pre></td></tr></table></figure>
 <p>该命令从vtcm_emulater中获取可信根公钥，并在vtcm_utils内存中存放。</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241206172844362.png" alt="image-20241206172844362"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241206172844362.png" srcset="/img/loading.gif" lazyload alt="image-20241206172844362"></p>
 <p>下一条指令是apcreate，这条指令用来创建应用和模拟器中对象的会话。初始化过程中，模拟器内部并没有合适的对象，因此apcreate命令将创建一个叫做 ET_NONE类型（编号为0x12）的会话，这一会话专用于初始化过程。 此时apcreate命令格式为</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apcreate –it 12</span><br></pre></td></tr></table></figure>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241206210850769.png" alt="image-20241206210850769"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">apcreate –it 12<br></code></pre></td></tr></table></figure>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241206210850769.png" srcset="/img/loading.gif" lazyload alt="image-20241206210850769"></p>
 <p>输出命令格式为</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241206210910901.png" alt="image-20241206210910901"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241206210910901.png" srcset="/img/loading.gif" lazyload alt="image-20241206210910901"></p>
 <p>此时vtcm_utils 和 vtcm_emulator 之间已经建立了一个会话。</p>
 <p>下面是初始化过程中最关键的一个命令takeownership，该命令完成可信根属主口令的生成、可信根存储密钥以及根存储密钥口令的生成。属主口令用来获取可信根中属主的权限，可以进行用户鉴别密钥生成等操作。</p>
 <p>命令的输入参数应包括属主口令、根存储密钥口令，也就是要自己设两个口令。</p>
 <p>输入格式为：takeownership  -pwdo 用户口令 – pwds  smk口令</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">takeownership -pwdo 123456 –pwds 123</span><br></pre></td></tr></table></figure>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207152810390.png" alt="image-20241207152810390"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">takeownership -pwdo 123456 –pwds 123<br></code></pre></td></tr></table></figure>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207152810390.png" srcset="/img/loading.gif" lazyload alt="image-20241207152810390"></p>
 <p>在term1中可看到成功拿到句柄</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207152852669.png" alt="image-20241207152852669"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207152852669.png" srcset="/img/loading.gif" lazyload alt="image-20241207152852669"></p>
 <p>takeownership 命令执行成功后，将在TCM中创建存储根密钥smk,其实 体类型值为04。我们可以通过用apcreate命令创建vtcm_utils和smk的会话 来验证takeownership 是否成功。测试命令为apcreate  -it 04 -pwd  smk口令</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apcreate -it 04 -pwd 123</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">apcreate -it 04 -pwd 123<br></code></pre></td></tr></table></figure>
 <p>下面为测试命令的输出内容，我们可以看到两个返回值，第一个是命令返回码，其取值为0，表示执行正确，第二个则是apcreate命令与smk之间建立可信会话连接的会话句柄。这表示takeownership命令执行正确。</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207153121633.png" alt="image-20241207153121633"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207153121633.png" srcset="/img/loading.gif" lazyload alt="image-20241207153121633"></p>
 <p>而如果我们输入错误的smk口令或者省略了-pwd选项，则我们应该在命令最 后得到下面的结果：</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207153215303.png" alt="image-20241207153215303"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207153215303.png" srcset="/img/loading.gif" lazyload alt="image-20241207153215303"></p>
 <h3 id="初始化自动化脚本">初始化自动化脚本</h3>
 <p>下面附上我自己写的脚本（<mark>注意，我是在Windows上写的，Linux识别Windows的换行符会识别成字符，请先测试一下再实际使用</mark>）</p>
 <p>在项目根目录下创建四个shell文件：</p>
 <ol>
 <li>
 <p>build_vctm.sh</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/bash</span></span><br><span class="line"></span><br><span class="line">mkdir vtcm</span><br><span class="line">cd vtcm</span><br><span class="line">git clone https://gitee.com/biparadox/cube-1.3.git</span><br><span class="line">git clone https://gitee.com/biparadox/cube-tcm.git</span><br><span class="line">git clone https://github.com/TCLab-BJUT/gm_sm2.git</span><br><span class="line">cd gm_sm2</span><br><span class="line">make</span><br><span class="line">cp ./bin/libsm2So.so ../cube-tcm/locallib</span><br><span class="line">cd ../cube-1.3</span><br><span class="line"></span><br><span class="line">sed -i &quot;s|export CUBEAPPPATH=\`pwd\`|export CUBEAPPPATH=/opt/cube-1.3|&quot; set_env.sh#把这里的/opt/cube-1.3改成自己cube-1.3的地址</span><br><span class="line"></span><br><span class="line">source set_env.sh</span><br><span class="line">sh env_build.sh</span><br><span class="line">cd ../cube-tcm</span><br><span class="line"></span><br><span class="line">sed -i &quot;s|export CUBEAPPPATH=\`pwd\`|export CUBEAPPPATH=/opt/build_vtcm/vtcm/cube-tcm|&quot; set_env.sh#把这里的/opt/cube-1.3改成自己cube-tcm的地址</span><br><span class="line"></span><br><span class="line">source set_env.sh</span><br><span class="line">sh env_build.sh</span><br><span class="line">cd vtcm_dev</span><br><span class="line">make</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">#</span><span class="language-bash">!/bin/bash</span><br><br>mkdir vtcm<br>cd vtcm<br>git clone https://gitee.com/biparadox/cube-1.3.git<br>git clone https://gitee.com/biparadox/cube-tcm.git<br>git clone https://github.com/TCLab-BJUT/gm_sm2.git<br>cd gm_sm2<br>make<br>cp ./bin/libsm2So.so ../cube-tcm/locallib<br>cd ../cube-1.3<br><br>sed -i &quot;s|export CUBEAPPPATH=\`pwd\`|export CUBEAPPPATH=/opt/cube-1.3|&quot; set_env.sh#把这里的/opt/cube-1.3改成自己cube-1.3的地址<br><br>source set_env.sh<br>sh env_build.sh<br>cd ../cube-tcm<br><br>sed -i &quot;s|export CUBEAPPPATH=\`pwd\`|export CUBEAPPPATH=/opt/build_vtcm/vtcm/cube-tcm|&quot; set_env.sh#把这里的/opt/cube-1.3改成自己cube-tcm的地址<br><br>source set_env.sh<br>sh env_build.sh<br>cd vtcm_dev<br>make<br></code></pre></td></tr></table></figure>
 </li>
 <li>
 <p>set_env.sh</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/bash</span></span><br><span class="line"></span><br><span class="line">current_path=/opt/build_vtcm#这里改成自己的根目录所在地址</span><br><span class="line">cd ./vtcm/cube-1.3</span><br><span class="line">source set_env.sh</span><br><span class="line">cd ../cube-tcm</span><br><span class="line">source set_env.sh</span><br><span class="line">cd $current_path</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">#</span><span class="language-bash">!/bin/bash</span><br><br>current_path=/opt/build_vtcm#这里改成自己的根目录所在地址<br>cd ./vtcm/cube-1.3<br>source set_env.sh<br>cd ../cube-tcm<br>source set_env.sh<br>cd $current_path<br></code></pre></td></tr></table></figure>
 </li>
 <li>
 <p>run_vtcm_netlink_emulator.sh</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/bash</span></span><br><span class="line"></span><br><span class="line">sudo ./load_vtcmd_dev.sh</span><br><span class="line">cd ../vtcm_netlink_emulator</span><br><span class="line">./main_proc</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">#</span><span class="language-bash">!/bin/bash</span><br><br>sudo ./load_vtcmd_dev.sh<br>cd ../vtcm_netlink_emulator<br>./main_proc<br></code></pre></td></tr></table></figure>
 </li>
 <li>
 <p>test_pcrread.sh</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/bash</span></span><br><span class="line"></span><br><span class="line">cd ./vtcm/cube-tcm/vtcm_utils</span><br><span class="line">./main_proc ./pcr/pcrread.cmd</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">#</span><span class="language-bash">!/bin/bash</span><br><br>cd ./vtcm/cube-tcm/vtcm_utils<br>./main_proc ./pcr/pcrread.cmd<br></code></pre></td></tr></table></figure>
 </li>
 </ol>
 <p>在term1中执行</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">source build_vctm.sh</span><br><span class="line">sh run_vtcm_netlink_emulator.sh</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">source build_vctm.sh<br>sh run_vtcm_netlink_emulator.sh<br></code></pre></td></tr></table></figure>
 <p>在term2中执行</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">source set_env.sh</span><br><span class="line">sh test_pcrread.sh</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">source set_env.sh<br>sh test_pcrread.sh<br></code></pre></td></tr></table></figure>
 <h3 id="加密、解密、签名、验证">加密、解密、签名、验证</h3>
 <h4 id="密钥创建">密钥创建</h4>
 <p>下面首先执行创建密钥操作。TCM中，密钥创建可以选择基于SM2算法的非对称钥和基于SM4算法的对称钥。密钥创建命令为createwrapkey。tcm_utils 接受的密钥创建命令其格式如下：</p>
 <p>createwrapkey -ikh 封装密钥句柄 –ish 封装密钥会话句柄 -is (sm2|sm4)  -kf  密钥文件名称 -pwdk 密钥授权口令 [–pwdm 密钥移植口令]</p>
 <p>下面我们写一个密钥创建脚本程序createkey.cmd，该程序以SMK为封装密钥创建一个非对称密钥和一个对称密钥，密钥口令分别为sm2和sm4，并分别存储在文件sm2.key和文件sm4.key中，脚本如下：</p>
 <p>我们可以输入以下命令，来创建对称密钥和非对称密钥。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">in: apcreate -it 04 -pwd sss</span><br><span class="line">out: 1:$smkHandle</span><br><span class="line">in: createwrapkey -ikh 40000000 -ish $smkHandle -is sm2 -kf sm2.key -pwdk sm2</span><br><span class="line">in: createwrapkey -ikh 40000000 -ish $smkHandle -is sm4 -kf sm4.key -pwdk sm4</span><br><span class="line">in: apterminate -ih $smkHandle</span><br></pre></td></tr></table></figure>
+<figure class="highlight vbnet"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs vbnet"><span class="hljs-symbol">in:</span> apcreate -it <span class="hljs-number">04</span> -pwd sss<br><span class="hljs-symbol">out:</span> <span class="hljs-number">1</span>:$smkHandle<br><span class="hljs-symbol">in:</span> createwrapkey -ikh <span class="hljs-number">40000000</span> -ish $smkHandle -<span class="hljs-built_in">is</span> sm2 -kf sm2.<span class="hljs-keyword">key</span> -pwdk sm2<br><span class="hljs-symbol">in:</span> createwrapkey -ikh <span class="hljs-number">40000000</span> -ish $smkHandle -<span class="hljs-built_in">is</span> sm4 -kf sm4.<span class="hljs-keyword">key</span> -pwdk sm4<br><span class="hljs-symbol">in:</span> apterminate -ih $smkHandle<br></code></pre></td></tr></table></figure>
 <p>当然也可以手动输入，由于前文我已经获取到了句柄，为b90e432，所以我直接使用该句柄就行。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">createwrapkey -ikh 40000000 -ish b90e432 -is sm2 -kf sm2.key -pwdk sm2</span><br><span class="line">createwrapkey -ikh 40000000 -ish b90e432 -is sm4 -kf sm4.key -pwdk sm4</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">createwrapkey -ikh 40000000 -ish b90e432 -is sm2 -kf sm2.key -pwdk sm2<br>createwrapkey -ikh 40000000 -ish b90e432 -is sm4 -kf sm4.key -pwdk sm4<br></code></pre></td></tr></table></figure>
 <p>创建成功后可以看到文件夹下多了sm2和sm4的密钥文件</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207161731111.png" alt="image-20241207161731111"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207161731111.png" srcset="/img/loading.gif" lazyload alt="image-20241207161731111"></p>
 <h4 id="加密解密">加密解密</h4>
 <p>非对称密钥加密解密：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">in: sm2encrypt -kf sm2.key -rf sm2test.dat -wf sm2crypt.dat</span><br><span class="line">in:  apcreate -it 04 -pwd sss</span><br><span class="line">out: 1:$smkHandle </span><br><span class="line">in: loadkey -ih $smkHandle -kf sm2.key </span><br><span class="line">out: 1:$keyHandle </span><br><span class="line">in: apterminate -ih $smkHandle </span><br><span class="line">in: apcreate -it 01 -iv $keyHandle -pwd sm2 </span><br><span class="line">out: 1:$keyAuthHandle </span><br><span class="line">in: sm2decrypt -ik $keyHandle -is $keyAuthHandle -rf sm2crypt.dat  -wf </span><br><span class="line">sm2decrypt.dat </span><br><span class="line">in: apterminate -ih $keyAuthHandle</span><br></pre></td></tr></table></figure>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs stylus"><span class="hljs-keyword">in</span>: sm2encrypt -kf sm2<span class="hljs-selector-class">.key</span> -rf sm2test<span class="hljs-selector-class">.dat</span> -wf sm2crypt<span class="hljs-selector-class">.dat</span><br><span class="hljs-keyword">in</span>:  apcreate -it <span class="hljs-number">04</span> -pwd sss<br>out: <span class="hljs-number">1</span>:<span class="hljs-variable">$smkHandle</span> <br><span class="hljs-keyword">in</span>: loadkey -ih <span class="hljs-variable">$smkHandle</span> -kf sm2<span class="hljs-selector-class">.key</span> <br>out: <span class="hljs-number">1</span>:<span class="hljs-variable">$keyHandle</span> <br><span class="hljs-keyword">in</span>: apterminate -ih <span class="hljs-variable">$smkHandle</span> <br><span class="hljs-keyword">in</span>: apcreate -it <span class="hljs-number">01</span> -iv <span class="hljs-variable">$keyHandle</span> -pwd sm2 <br>out: <span class="hljs-number">1</span>:<span class="hljs-variable">$keyAuthHandle</span> <br><span class="hljs-keyword">in</span>: sm2decrypt -ik <span class="hljs-variable">$keyHandle</span> -is <span class="hljs-variable">$keyAuthHandle</span> -rf sm2crypt<span class="hljs-selector-class">.dat</span>  -wf <br>sm2decrypt<span class="hljs-selector-class">.dat</span> <br><span class="hljs-keyword">in</span>: apterminate -ih <span class="hljs-variable">$keyAuthHandle</span><br></code></pre></td></tr></table></figure>
 <p>创建一个数据文件sm2test.dat，此处我写入数据vTCM_is_good：</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207162537053.png" alt="image-20241207162537053"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207162537053.png" srcset="/img/loading.gif" lazyload alt="image-20241207162537053"></p>
 <p>输入命令</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sm2encrypt -kf sm2.key -rf sm2test.dat -wf sm2crypt.dat</span><br></pre></td></tr></table></figure>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207162709694.png" alt="image-20241207162709694"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sm2encrypt -kf sm2.key -rf sm2test.dat -wf sm2crypt.dat<br></code></pre></td></tr></table></figure>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207162709694.png" srcset="/img/loading.gif" lazyload alt="image-20241207162709694"></p>
 <p>使用smk句柄（b90e432）输入命令</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loadkey -ih b90e432 -kf sm2.key </span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">loadkey -ih b90e432 -kf sm2.key <br></code></pre></td></tr></table></figure>
 <p>此时会返回sm2密钥的句柄80bd5ebe，之后请自行替换有关80bd5ebe的地方。</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207163509456.png" alt="image-20241207163509456"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207163509456.png" srcset="/img/loading.gif" lazyload alt="image-20241207163509456"></p>
 <p>使用密钥句柄，获取密钥授权句柄</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apcreate -it 01 -iv 80bd5ebe -pwd sm2</span><br></pre></td></tr></table></figure>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207163856377.png" alt="image-20241207163856377"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">apcreate -it 01 -iv 80bd5ebe -pwd sm2<br></code></pre></td></tr></table></figure>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207163856377.png" srcset="/img/loading.gif" lazyload alt="image-20241207163856377"></p>
 <p>此处我的句柄为79d4a365，之后请自行替换有关79d4a365的地方。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sm2decrypt -ik 80bd5ebe -is 79d4a365 -rf sm2crypt.dat  -wf sm2decrypt.dat</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sm2decrypt -ik 80bd5ebe -is 79d4a365 -rf sm2crypt.dat  -wf sm2decrypt.dat<br></code></pre></td></tr></table></figure>
 <p>打开sm2decrypt.dat文件，发现解密成功：</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207165332904.png" alt="image-20241207165332904"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207165332904.png" srcset="/img/loading.gif" lazyload alt="image-20241207165332904"></p>
 <p>对称密钥加解密脚本：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">in: apcreate -it 04 -pwd sss</span><br><span class="line">out: 1:$smkHandle</span><br><span class="line">in: loadkey -ih $smkHandle -kf sm4.key</span><br><span class="line">out: 1:$keyHandle</span><br><span class="line">in: apterminate -ih $smkHandle</span><br><span class="line">in: apcreate -it 01 -iv $keyHandle -pwd sm4</span><br><span class="line">out: 1:$keyAuthHandle  </span><br><span class="line">in: sm4encrypt -ikh $keyHandle -idh $keyAuthHandle -rf sm4test.dat -wf sm4crypt.dat</span><br><span class="line">in: sm4decrypt -ikh $keyHandle -idh $keyAuthHandle -rf sm4crypt.dat -wf sm4decrypt.dat</span><br><span class="line">in: apterminate -ih $keyAuthHandle</span><br></pre></td></tr></table></figure>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs stylus"><span class="hljs-keyword">in</span>: apcreate -it <span class="hljs-number">04</span> -pwd sss<br>out: <span class="hljs-number">1</span>:<span class="hljs-variable">$smkHandle</span><br><span class="hljs-keyword">in</span>: loadkey -ih <span class="hljs-variable">$smkHandle</span> -kf sm4<span class="hljs-selector-class">.key</span><br>out: <span class="hljs-number">1</span>:<span class="hljs-variable">$keyHandle</span><br><span class="hljs-keyword">in</span>: apterminate -ih <span class="hljs-variable">$smkHandle</span><br><span class="hljs-keyword">in</span>: apcreate -it <span class="hljs-number">01</span> -iv <span class="hljs-variable">$keyHandle</span> -pwd sm4<br>out: <span class="hljs-number">1</span>:<span class="hljs-variable">$keyAuthHandle</span>  <br><span class="hljs-keyword">in</span>: sm4encrypt -ikh <span class="hljs-variable">$keyHandle</span> -idh <span class="hljs-variable">$keyAuthHandle</span> -rf sm4test<span class="hljs-selector-class">.dat</span> -wf sm4crypt<span class="hljs-selector-class">.dat</span><br><span class="hljs-keyword">in</span>: sm4decrypt -ikh <span class="hljs-variable">$keyHandle</span> -idh <span class="hljs-variable">$keyAuthHandle</span> -rf sm4crypt<span class="hljs-selector-class">.dat</span> -wf sm4decrypt<span class="hljs-selector-class">.dat</span><br><span class="hljs-keyword">in</span>: apterminate -ih <span class="hljs-variable">$keyAuthHandle</span><br></code></pre></td></tr></table></figure>
 <p>接下来一步步来看对应的结果，首先smk句柄我们已经获取到了，那么直接获取密钥句柄</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loadkey -ih b90e432 -kf sm4.key</span><br></pre></td></tr></table></figure>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207170828244.png" alt="image-20241207170828244"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">loadkey -ih b90e432 -kf sm4.key<br></code></pre></td></tr></table></figure>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207170828244.png" srcset="/img/loading.gif" lazyload alt="image-20241207170828244"></p>
 <p>我的密钥句柄为7fee8800，请读者自行在对应的地方替换成自己的句柄。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apterminate -ih b90e432</span><br><span class="line">apcreate -it 01 -iv 7fee8800 -pwd sm4</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">apterminate -ih b90e432<br>apcreate -it 01 -iv 7fee8800 -pwd sm4<br></code></pre></td></tr></table></figure>
 <p>此时返回密钥授权句柄，为4f5e17bf。</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207171131431.png" alt="image-20241207171131431"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207171131431.png" srcset="/img/loading.gif" lazyload alt="image-20241207171131431"></p>
 <p>到这一步我们先在./vtcm_utils文件夹下建立sm4test.dat文件，并写入数据。</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207171505646.png" alt="image-20241207171505646"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207171505646.png" srcset="/img/loading.gif" lazyload alt="image-20241207171505646"></p>
 <p>使用sm4进行加密</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sm4encrypt -ikh 7fee8800 -idh 4f5e17bf -rf sm4test.dat -wf sm4crypt.dat</span><br></pre></td></tr></table></figure>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207171559386.png" alt="image-20241207171559386"></p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207171543801.png" alt="image-20241207171543801"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sm4encrypt -ikh 7fee8800 -idh 4f5e17bf -rf sm4test.dat -wf sm4crypt.dat<br></code></pre></td></tr></table></figure>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207171559386.png" srcset="/img/loading.gif" lazyload alt="image-20241207171559386"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207171543801.png" srcset="/img/loading.gif" lazyload alt="image-20241207171543801"></p>
 <p>接下来进行解密：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sm4decrypt -ikh 7fee8800 -idh 4f5e17bf -rf sm4crypt.dat -wf sm4decrypt.dat</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sm4decrypt -ikh 7fee8800 -idh 4f5e17bf -rf sm4crypt.dat -wf sm4decrypt.dat<br></code></pre></td></tr></table></figure>
 <p>解密成功：</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207171910659.png" alt="image-20241207171910659"></p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207171926293.png" alt="image-20241207171926293"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207171910659.png" srcset="/img/loading.gif" lazyload alt="image-20241207171910659"></p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20241207171926293.png" srcset="/img/loading.gif" lazyload alt="image-20241207171926293"></p>
 <h3 id="PIK申请过程🕊️">PIK申请过程🕊️</h3>
-</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://yzsandw.com">5Y2z</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://yzsandw.com/2025/10/17/%E8%99%9A%E6%8B%9F%E5%8F%AF%E4%BF%A1%E6%A0%B9%E5%AE%9E%E9%AA%8C/">http://yzsandw.com/2025/10/17/虚拟可信根实验/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://yzsandw.com" target="_blank">5Y2z_blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/vTPM/">vTPM</a><a class="post-meta__tags" href="/tags/vTCM/">vTCM</a><a class="post-meta__tags" href="/tags/swtpm/">swtpm</a></div><div class="post-share"><div class="social-share" data-image="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/109951168793024714.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/08/25/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%9A%84Kernel-Pwn%E5%85%A5%E9%97%A8/" title="直博自救，从零开始的Kernel Pwn入门"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">直博自救，从零开始的Kernel Pwn入门</div></div><div class="info-2"><div class="info-item-1">...</div></div></div></a></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div><div class="comment-switch"><span class="first-comment">Utterances</span><span id="switch-btn"></span><span class="second-comment">Gitalk</span></div></div><div class="comment-wrap"><div><div id="utterances-wrap"></div></div><div><div id="gitalk-container"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="https://i.postimg.cc/SsrHG3pr/preview.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">5Y2z</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">30</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/yzsandw"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/yzsandw" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292eth;"></i></a><a class="social-icon" href="mailto:yzsandw@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#swtpm"><span class="toc-number">1.</span> <span class="toc-text">swtpm</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#vTCM"><span class="toc-number">2.</span> <span class="toc-text">vTCM</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BD%E5%AF%86%E7%AE%97%E6%B3%95%E5%8C%85%E7%BC%96%E8%AF%91"><span class="toc-number">2.1.</span> <span class="toc-text">国密算法包编译</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#cube-1-3%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE"><span class="toc-number">2.2.</span> <span class="toc-text">cube-1.3环境变量设置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#cube-tcm%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE"><span class="toc-number">2.3.</span> <span class="toc-text">cube-tcm环境变量设置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE-bashrc%E6%96%87%E4%BB%B6"><span class="toc-number">2.4.</span> <span class="toc-text">设置.bashrc文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#cube-tcm%E7%BC%96%E8%AF%91"><span class="toc-number">2.5.</span> <span class="toc-text">cube-tcm编译</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TCM%E6%9C%8D%E5%8A%A1%E5%8A%9F%E8%83%BD%E4%B8%8E%E6%93%8D%E4%BD%9C%E5%AE%9E%E4%BE%8B"><span class="toc-number">2.6.</span> <span class="toc-text">TCM服务功能与操作实例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">2.6.1.</span> <span class="toc-text">初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E8%87%AA%E5%8A%A8%E5%8C%96%E8%84%9A%E6%9C%AC"><span class="toc-number">2.6.2.</span> <span class="toc-text">初始化自动化脚本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A0%E5%AF%86%E3%80%81%E8%A7%A3%E5%AF%86%E3%80%81%E7%AD%BE%E5%90%8D%E3%80%81%E9%AA%8C%E8%AF%81"><span class="toc-number">2.6.3.</span> <span class="toc-text">加密、解密、签名、验证</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%86%E9%92%A5%E5%88%9B%E5%BB%BA"><span class="toc-number">2.6.3.1.</span> <span class="toc-text">密钥创建</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%86"><span class="toc-number">2.6.3.2.</span> <span class="toc-text">加密解密</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PIK%E7%94%B3%E8%AF%B7%E8%BF%87%E7%A8%8B%F0%9F%95%8A%EF%B8%8F"><span class="toc-number">2.6.4.</span> <span class="toc-text">PIK申请过程🕊️</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/10/17/%E8%99%9A%E6%8B%9F%E5%8F%AF%E4%BF%A1%E6%A0%B9%E5%AE%9E%E9%AA%8C/" title="虚拟可信根实验"><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/109951168793024714.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="虚拟可信根实验"/></a><div class="content"><a class="title" href="/2025/10/17/%E8%99%9A%E6%8B%9F%E5%8F%AF%E4%BF%A1%E6%A0%B9%E5%AE%9E%E9%AA%8C/" title="虚拟可信根实验">虚拟可信根实验</a><time datetime="2025-10-17T07:36:44.000Z" title="发表于 2025-10-17 15:36:44">2025-10-17</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/08/25/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%9A%84Kernel-Pwn%E5%85%A5%E9%97%A8/" title="直博自救，从零开始的Kernel Pwn入门">直博自救，从零开始的Kernel Pwn入门</a><time datetime="2025-08-25T06:26:27.000Z" title="发表于 2025-08-25 14:26:27">2025-08-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/07/09/%E7%AE%80%E5%8D%95%E4%BA%86%E8%A7%A3PCI%E6%80%BB%E7%BA%BF/" title="简单了解PCI总线"><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/fe48cc7f9c7faaf513b78a0bb6c239e.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="简单了解PCI总线"/></a><div class="content"><a class="title" href="/2025/07/09/%E7%AE%80%E5%8D%95%E4%BA%86%E8%A7%A3PCI%E6%80%BB%E7%BA%BF/" title="简单了解PCI总线">简单了解PCI总线</a><time datetime="2025-07-09T03:06:04.000Z" title="发表于 2025-07-09 11:06:04">2025-07-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/05/14/pwn%E5%81%9A%E9%A2%98%E8%AE%B0%E5%BD%95/" title="pwn做题记录"><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/pwn记录.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="pwn做题记录"/></a><div class="content"><a class="title" href="/2025/05/14/pwn%E5%81%9A%E9%A2%98%E8%AE%B0%E5%BD%95/" title="pwn做题记录">pwn做题记录</a><time datetime="2025-05-14T06:42:45.000Z" title="发表于 2025-05-14 14:42:45">2025-05-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/03/27/Windows11%E5%85%B3%E9%97%AD%E2%80%9C%E5%9F%BA%E4%BA%8E%E8%99%9A%E6%8B%9F%E5%8C%96%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E2%80%9D/" title="Windows11关闭“基于虚拟化的安全性”"><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/Windows11关闭“基于虚拟化的安全性”.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Windows11关闭“基于虚拟化的安全性”"/></a><div class="content"><a class="title" href="/2025/03/27/Windows11%E5%85%B3%E9%97%AD%E2%80%9C%E5%9F%BA%E4%BA%8E%E8%99%9A%E6%8B%9F%E5%8C%96%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E2%80%9D/" title="Windows11关闭“基于虚拟化的安全性”">Windows11关闭“基于虚拟化的安全性”</a><time datetime="2025-03-27T08:49:34.000Z" title="发表于 2025-03-27 16:49:34">2025-03-27</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/109951168793024714.jpg);"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By 5Y2z</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><div class="js-pjax"><script>(async () => {
-  const showKatex = () => {
-    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
-  }
 
-  if (!window.katex_js_css) {
-    window.katex_js_css = true
-    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css')
-    if (true) {
-      await btf.getScript('https://cdn.jsdelivr.net/npm/katex/dist/contrib/copy-tex.min.js')
-    }
-  }
-
-  showKatex()
-})()</script><script>(() => {
-  const isShuoshuo = GLOBAL_CONFIG_SITE.isShuoshuo
-  const option = null
-  const getUtterancesTheme = theme => theme === 'dark' ? 'photon-dark' : 'github-light'
-
-  const loadUtterances = (el = document, key) => {
-    if (isShuoshuo) {
-      window.shuoshuoComment.destroyUtterances = () => {
-        if (el.children.length) {
-          el.innerHTML = ''
-          el.classList.add('no-comment')
-        }
-      }
-    }
-
-    const config = {
-      src: 'https://utteranc.es/client.js',
-      repo: 'yzsandw/yzsandw.github.io',
-      theme: getUtterancesTheme(document.documentElement.getAttribute('data-theme')),
-      crossorigin: 'anonymous',
-      async: true,
-      ...option,
-      'issue-term': isShuoshuo ? key : (option && option['issue-term']) || 'pathname'
-    }
-
-    const ele = document.createElement('script')
-    Object.entries(config).forEach(([key, value]) => ele.setAttribute(key, value))
-    el.querySelector('#utterances-wrap').appendChild(ele)
-  }
-
-  const changeUtterancesTheme = theme => {
-    const iframe = document.querySelector('#utterances-wrap iframe')
-    if (iframe) {
-      const message = {
-        type: 'set-theme',
-        theme: getUtterancesTheme(theme)
-      };
-      iframe.contentWindow.postMessage(message, 'https://utteranc.es')
-    }
-  }
-
-  btf.addGlobalFn('themeChange', changeUtterancesTheme, 'utterances')
-
-  if (isShuoshuo) {
-    'Utterances' === 'Utterances'
-      ? window.shuoshuoComment = { loadComment: loadUtterances }
-      : window.loadOtherComment = loadUtterances
-    return
-  }
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
   
-  if ('Utterances' === 'Utterances' || !false) {
-    if (false) btf.loadComment(document.getElementById('utterances-wrap'), loadUtterances)
-    else loadUtterances()
-  } else {
-    window.loadOtherComment = loadUtterances
-  }
-})()</script><script>(() => {
-  const isShuoshuo = GLOBAL_CONFIG_SITE.isShuoshuo
-  const option = null
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/vTPM/" class="print-no-link">#vTPM</a>
+      
+        <a href="/tags/vTCM/" class="print-no-link">#vTCM</a>
+      
+        <a href="/tags/swtpm/" class="print-no-link">#swtpm</a>
+      
+    </div>
+  
+</div>
 
-  const commentCount = n => {
-    const isCommentCount = document.querySelector('#post-meta .gitalk-comment-count')
-    if (isCommentCount) {
-      isCommentCount.textContent= n
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>虚拟可信根实验</div>
+      <div>http://yzsandw.com/2025/10/17/虚拟可信根实验/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>5Y2z</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年10月17日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/11/05/%E5%8F%AF%E4%BF%A1%E5%90%AF%E5%8A%A8%E4%B8%8E%E5%9F%BA%E5%87%86%E5%80%BC/" title="可信启动流程">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">可信启动流程</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/08/25/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%9A%84Kernel-Pwn%E5%85%A5%E9%97%A8/" title="直博自救，从零开始的Kernel Pwn入门">
+                        <span class="hidden-mobile">直博自救，从零开始的Kernel Pwn入门</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
     }
-  }
 
-  const initGitalk = (el, path) => {
-    if (isShuoshuo) {
-      window.shuoshuoComment.destroyGitalk = () => {
-        if (el.children.length) {
-          el.innerHTML = ''
-          el.classList.add('no-comment')
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
         }
       }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
     }
-
-    const gitalk = new Gitalk({
-      clientID: '28dd598981c595459952',
-      clientSecret: 'a82c85f8b3575c923e14858ab7ec81325055d1ae',
-      repo: 'yzsandw.github.io',
-      owner: 'yzsandw',
-      admin: ['yzsandw'],
-      updateCountCallback: commentCount,
-      ...option,
-      id: isShuoshuo ? path : (option && option.id) || '78dc20baa503e95318ba82ad6d135770'
-    })
-
-    gitalk.render('gitalk-container')
-  }
-
-  const loadGitalk = async(el, path) => {
-    if (typeof Gitalk === 'function') initGitalk(el, path)
-    else {
-      await btf.getCSS('https://cdn.jsdelivr.net/npm/gitalk/dist/gitalk.min.css')
-      await btf.getScript('https://cdn.jsdelivr.net/npm/gitalk/dist/gitalk.min.js')
-      initGitalk(el, path)
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
     }
-  }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
 
-  if (isShuoshuo) {
-    'Utterances' === 'Gitalk'
-      ? window.shuoshuoComment = { loadComment: loadGitalk }
-      : window.loadOtherComment = loadGitalk
-    return
-  }
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
 
-  if ('Utterances' === 'Gitalk' || !false) {
-    if (false) btf.loadComment(document.getElementById('gitalk-container'), loadGitalk)
-    else loadGitalk()
-  } else {
-    window.loadOtherComment = loadGitalk
-  }
-})()</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

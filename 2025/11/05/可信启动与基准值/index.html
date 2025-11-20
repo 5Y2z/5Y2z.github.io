@@ -1,0 +1,931 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="https://i.postimg.cc/SsrHG3pr/preview.jpg">
+  <link rel="icon" href="https://i.postimg.cc/SsrHG3pr/preview.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="5Y2z">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="这玩意跟安全启动怎么老是纠缠不清的？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="可信启动流程">
+<meta property="og:url" content="http://yzsandw.com/2025/11/05/%E5%8F%AF%E4%BF%A1%E5%90%AF%E5%8A%A8%E4%B8%8E%E5%9F%BA%E5%87%86%E5%80%BC/index.html">
+<meta property="og:site_name" content="5Y2z_blog">
+<meta property="og:description" content="这玩意跟安全启动怎么老是纠缠不清的？">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-11-05T11:42:58.000Z">
+<meta property="article:modified_time" content="2025-11-20T08:04:02.182Z">
+<meta property="article:author" content="5Y2z">
+<meta property="article:tag" content="可信启动">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>可信启动流程 - 5Y2z_blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yzsandw.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2023-6-11","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>5Y2z_blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/img1.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="可信启动流程"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-11-05 19:42" pubdate>
+          2025年11月5日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          14 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">可信启动流程</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="可信启动">可信启动</h1>
+<h2 id="基准值">基准值</h2>
+<p>在一些硬件平台的实现中，<strong>初始平台度量值</strong>用来表示平台首次启动时的度量基线，这些初始值是由硬件厂商或系统集成商预设的，通常存储在TPM的<strong>非易失性存储区</strong>中。</p>
+<h3 id="TCG规范">TCG规范</h3>
+<h4 id="《TCG-PC-Client-Platform-Firmware-Profile-Specification》">《<strong>TCG PC Client Platform Firmware Profile Specification</strong>》</h4>
+<ul>
+<li>
+<p>章节：<strong>7.4.1 Root of Trust for Measurement (RTM)</strong></p>
+<blockquote>
+<p>“The RTM is the component that performs the first measurement and extends it into a Platform Configuration Register (PCR).<br>
+The firmware code and configuration used by the RTM are defined at manufacture time and cannot be modified post-manufacture except by an authorized update process.”</p>
+</blockquote>
+<p>第一次度量动作（测量 Boot Block）由 <strong>出厂时定义的代码执行</strong>；</p>
+<p>该代码及其基准（即被信任的初始哈希或签名公钥）在<strong>制造阶段写入</strong>；</p>
+<p>后续不可随意更改，除非有授权更新（厂商签名更新 BIOS）。</p>
+</li>
+</ul>
+<h3 id="国家标准">国家标准</h3>
+<h4 id="《GM-T-0054-2018-可信计算平台-软件度量与验证规范》">《<strong>GM/T 0054-2018 可信计算平台 软件度量与验证规范</strong>》</h4>
+<ul>
+<li>
+<p>第6章：</p>
+<blockquote>
+<p>“可信基准值由可信软件发布者或平台提供者在受控环境下计算产生，并在平台生产或初始化阶段写入可信平台控制模块或固件中。”</p>
+</blockquote>
+</li>
+</ul>
+<p>这些标准要求在<strong>设备制造时</strong>通过<strong>硬件信任根</strong>（例如芯片内的加密密钥和证书）进行最初的基准值写入，后续启动过程中的所有度量值都将与这些预设的基准值进行比对。</p>
+<h3 id="硬件厂商标准">硬件厂商标准</h3>
+<h4 id="Intel-BootGuard-Specification"><strong>Intel BootGuard Specification</strong></h4>
+<blockquote>
+<p>“Platform owners or OEMs fuse the Boot Policy Manifest (BPM) and hash of the BIOS public key into the Platform Controller Hub (PCH) Field Programmable Fuses (FPFs) at manufacturing time.”</p>
+</blockquote>
+<h3 id="AMD-Platform-Security-Processor-PSP"><strong>AMD Platform Security Processor (PSP)</strong></h3>
+<blockquote>
+<p>“The PSP verifies the initial BIOS image using a public key hash fused at manufacturing.<br>
+The key hash is programmed into the SoC fuses and cannot be modified after fabrication.”</p>
+</blockquote>
+<h2 id="系统启动流程">系统启动流程</h2>
+<p>PSP核启动后加载PSP的bootloader，由bootloader做各种初始化，随后BootLoader</p>
+<h2 id="关键组件和代码度量">关键组件和代码度量</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">关键组件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">BIOS/U-BOOT</td>
+</tr>
+<tr>
+<td style="text-align:center">PciRoot(0x0)/Pci(0x8,0x1)/Pci(0x0,0x2)/Sata(0x6,0xFFFF,0x0)/HD(1,GPT,D43E84F4-0E97-4488-91B3-8A727A8A9572,0x800,0x100000)/\EFI\ubuntu\grubx64.efi</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/normal.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/terminal.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/crypto.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/bufio.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/extcmd.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/boot.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/gettext.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/gzio.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/command.lst</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/fs.lst</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/crypto.lst</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/terminal.lst</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/grub.cfg</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: [ -s (hd1,gpt3)/boot/grub/grubenv ]</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/test.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/grubenv</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: load_env</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/loadenv.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/disk.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/grubenv</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: [  ]</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: set default=Advanced options for Ubuntu</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: [ xy = xy ]</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: menuentry_id_option=–id</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: export menuentry_id_option</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: font=unicode</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: loadfont unicode</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/font.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/video.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/fonts/unicode.pf2</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: set gfxmode=auto</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: load_video</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: insmod all_video</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/all_video.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/efi_gop.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/video_fb.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/efi_uga.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/video_bochs.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/video_cirrus.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: insmod gfxterm</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/gfxterm.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: set locale_dir=(hd1,gpt3)/boot/grub/local</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: set lang=en_US</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: insmod gettext</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: terminal_output gfxterm</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: set timeout_style=hidden</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: set timeout=2</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: [ -f (hd1,gpt3)/boot/grub/custom.cfg ]</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: setparams Advanced options for Ubuntu GN</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: setparams Ubuntu GNU/Linux, with Linux 5</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: load_video</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: insmod all_video</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: set gfxpayload=keep</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: insmod gzio</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: insmod part_gpt</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: insmod ext2</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: set root=hd0,gpt3</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: search --no-floppy --fs-uuid --set=root</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/search.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/search_fs_uuid.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/search_fs_file.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/search_label.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: echo Loading Linux 5.10.112-hygon …</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/echo.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: linux /boot/vmlinuz-5.10.112-hygon root=UUID</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/linux.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/relocator.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">(hd1,gpt3)/boot/grub/x86_64-efi/mmap.mod</td>
+</tr>
+<tr>
+<td style="text-align:center">/boot/vmlinuz-5.10.112-hygon</td>
+</tr>
+<tr>
+<td style="text-align:center">kernel_cmdline: /boot/vmlinuz-5.10.112-hygon root=</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: echo Loading initial ramdisk …</td>
+</tr>
+<tr>
+<td style="text-align:center">grub_cmd: initrd /boot/initrd.img-5.10.112-hygon</td>
+</tr>
+<tr>
+<td style="text-align:center">/boot/initrd.img-5.10.112-hygon</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<p><strong>1) 固件与设备路径（上电 → 固件）</strong></p>
+<p>主板固件（BIOS/UEFI 或 U-Boot）启动后会做硬件初始化（CPU、内存、PCI 总线、存储控制器），然后按固件配置选择一个设备（比如哪个 SATA 端口、哪个 NVMe）来读取并执行第一级引导程序（例如 EFI 下的 bootloader）。固件还可能验证引导程序签名（Secure Boot）或按启动顺序选择设备。 上电后跑的代码是 BIOS/UEFI 或 U-Boot，它决定从哪块盘、哪条总线把引导器拉起来。固件被改了，后面所有东西都可能是假象。<code>BIOS/U-BOOT</code>、<code>PciRoot(...)/Sata(...)</code>、<code>(hd1,gpt3)</code> 就是这个层面的文件。</p>
+<p><strong>2) 加载grub本体</strong></p>
+<p>固件把 GRUB 的主可执行文件（例如 <code>EFI/BOOT/grubx64.efi</code> 或 <code>/boot/efi/.../grubx64.efi</code>）载入内存并运行。这一步会把 GRUB 的基础执行环境建立起来，准备加载 GRUB 的模块和配置文件。替换这个文件或它的签名会导致后续的启动甚至不是启动用户自己的操作系统。要度量的是 EFI 下的 grub 二进制和最早被加载的模块（ <code>.../boot/grub/x86_64-efi/...</code> ）。</p>
+<p><strong>3) GRUB 模块加载</strong></p>
+<p>GRUB 的很多功能并非内建在一个巨大的单体程序里，而是以模块（<code>.mod</code> 文件）形式存在。举例：<code>ext2</code> 模块实现读取 ext 分区，<code>search_fs_uuid.mod</code> 实现按 UUID 查分区，<code>linux.mod</code> 实现把内核映像加载到内存，<code>crypto.mod</code> 实现加密/解密支持，<code>gzio.mod</code> 实现 gzip 解压。GRUB 启动时按需 <code>insmod</code>（加载）这些模块来完成具体动作。</p>
+<p>模块被替换能在很早就注入恶意行为，典型文件有 <code>linux.mod</code>, <code>disk.mod</code>, <code>search.mod</code>, <code>crypto.mod</code>, <code>gzio.mod</code>, <code>gfxterm.mod</code> 等。</p>
+<p><strong>4) 配置与环境（grub.cfg / grubenv）</strong><br>
+实际要做什么、用什么参数启动，这些都写在 <code>grub.cfg</code> 或 <code>grubenv</code>。攻击者常用的手法不是改二进制，而是改脚本：偷偷加一条菜单、在 kernel 行加 <code>init=/bin/sh</code>。所以把这些文本文件和 GRUB 在启动时执行的命令记录当做度量对象很重要。</p>
+<p><strong>5) 定位与读取（search / filesystem）</strong><br>
+GRUB 要先找到一个分区再去读文件。<code>search --fs-uuid</code>、part/FS 模块（<code>part_gpt</code>、<code>ext2</code>）和路径 <code>(hd1,gpt3)/boot/...</code> 是这一层的关键。这里被干的最简单也最常见：换盘、替换 <code>/boot/vmlinuz</code> 或 <code>/boot/initrd</code>。度量磁盘路径、search 模块和盘上这些文件，是检测文件级篡改的必做事。</p>
+<p><strong>6) 内核与 initrd（权力移交点）</strong><br>
+当 GRUB 把内核（<code>vmlinuz-*</code>）和 initrd（<code>initrd.img-*</code>）加载并把命令行交给它们，控制权就转交了。内核或 initrd 被改，系统基本完蛋。一定要度量内核映像、initrd 和负责加载它们的模块（<code>relocator.mod</code>/<code>mmap.mod</code> 等）。</p>
+<p><strong>7) 解密/UI/早期脚本（initrd、crypto、字体）</strong><br>
+如果有加密盘，GRUB 或 initrd 里会有解密逻辑；同时早期界面（<code>gfxterm</code>, <code>terminal</code>, 字体、<code>gettext</code>）是用户输入密码的点。攻击者常把这两者结合：伪造界面记录密码或用假 crypto 模块绕过解密。度量这些组件能防止口令泄露与解密被篡改。</p>
+<h1 id="安全启动">安全启动</h1>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%8F%AF%E4%BF%A1%E5%90%AF%E5%8A%A8/" class="print-no-link">#可信启动</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>可信启动流程</div>
+      <div>http://yzsandw.com/2025/11/05/可信启动与基准值/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>5Y2z</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年11月5日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/11/13/linux%E5%86%85%E6%A0%B8%E5%AD%A6%E4%B9%A0/" title="linux内核学习">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">linux内核学习</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/10/17/%E8%99%9A%E6%8B%9F%E5%8F%AF%E4%BF%A1%E6%A0%B9%E5%AE%9E%E9%AA%8C/" title="虚拟可信根实验">
+                        <span class="hidden-mobile">虚拟可信根实验</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
