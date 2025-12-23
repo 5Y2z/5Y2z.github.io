@@ -1,0 +1,707 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="https://i.postimg.cc/SsrHG3pr/preview.jpg">
+  <link rel="icon" href="https://i.postimg.cc/SsrHG3pr/preview.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="5Y2z">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="00 前言 开源项目地址：TSB-agent · GitHub 01 编译 操作系统：OpenEuler22.03 安装kernel-devel: yum install -y kernel-devel yum install -y kernel-headers proxy 编译 进入到proxy目录下，执行： make 如果使用的操作系统版本过高，可能会编译失败，报错： 123456789101">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TSB-agent分析">
+<meta property="og:url" content="http://yzsandw.com/2025/12/23/TSB-agent%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="5Y2z_blog">
+<meta property="og:description" content="00 前言 开源项目地址：TSB-agent · GitHub 01 编译 操作系统：OpenEuler22.03 安装kernel-devel: yum install -y kernel-devel yum install -y kernel-headers proxy 编译 进入到proxy目录下，执行： make 如果使用的操作系统版本过高，可能会编译失败，报错： 123456789101">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/f4b8b8caa807651fd0d96790ae2e439c.png">
+<meta property="og:image" content="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20251222194708300.png">
+<meta property="og:image" content="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/e978631f9a2167194b15b9c612448fa9.png">
+<meta property="og:image" content="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/mermaid-diagram-2025-12-23-154059.png">
+<meta property="og:image" content="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20251223172131906.png">
+<meta property="article:published_time" content="2025-12-23T11:08:57.000Z">
+<meta property="article:modified_time" content="2025-12-23T11:10:00.069Z">
+<meta property="article:author" content="5Y2z">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/f4b8b8caa807651fd0d96790ae2e439c.png">
+  
+  
+  
+  <title>TSB-agent分析 - 5Y2z_blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yzsandw.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2023-6-11","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>5Y2z_blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/img1.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="TSB-agent分析"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-12-23 19:08" pubdate>
+          2025年12月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          44 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">TSB-agent分析</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="00-前言">00 前言</h1>
+<p>开源项目地址：<a target="_blank" rel="noopener" href="https://github.com/openeuler-mirror/TSB-agent">TSB-agent · GitHub</a></p>
+<h1 id="01-编译">01 编译</h1>
+<p>操作系统：OpenEuler22.03</p>
+<p>安装kernel-devel:</p>
+<p><code>yum install -y kernel-devel</code></p>
+<p><code>yum install -y kernel-headers</code></p>
+<h2 id="proxy-编译">proxy 编译</h2>
+<p>进入到proxy目录下，执行： make</p>
+<p>如果使用的操作系统版本过高，可能会编译失败，报错：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs gradle"><span class="hljs-regexp">/opt/</span>TSB-agent<span class="hljs-regexp">/tss-main/</span>read_sysram/read_sysram.c:<span class="hljs-number">116</span>:<span class="hljs-number">24</span>: 附注：in expansion of macro ‘THIS_MODULE’<br>  <span class="hljs-number">116</span> |     cls = class_create(THIS_MODULE, <span class="hljs-string">&quot;memread_cls&quot;</span>);<br>      |                        ^~~~~~~~~~~<br>In <span class="hljs-keyword">file</span> included <span class="hljs-keyword">from</span> .<span class="hljs-regexp">/include/</span>linux/device.h:<span class="hljs-number">31</span>,<br>                 <span class="hljs-keyword">from</span> .<span class="hljs-regexp">/include/</span>linux/cdev.h:<span class="hljs-number">8</span>,<br>                 <span class="hljs-keyword">from</span> <span class="hljs-regexp">/opt/</span>TSB-agent<span class="hljs-regexp">/tss-main/</span>read_sysram/read_sysram.c:<span class="hljs-number">4</span>:<br>.<span class="hljs-regexp">/include/</span>linux<span class="hljs-regexp">/device/</span><span class="hljs-keyword">class</span>.h:<span class="hljs-number">236</span>:<span class="hljs-number">54</span>: 附注：需要类型‘const <span class="hljs-keyword">char</span> *’，但实参的类型为‘struct module *’<br>  <span class="hljs-number">236</span> | struct <span class="hljs-keyword">class</span> * __must_check class_create(const <span class="hljs-keyword">char</span> *name);<br>      |                                          ~~~~~~~~~~~~^~~~<br><span class="hljs-regexp">/opt/</span>TSB-agent<span class="hljs-regexp">/tss-main/</span>read_sysram/read_sysram.c:<span class="hljs-number">116</span>:<span class="hljs-number">11</span>: 错误：提供给函数‘class_create’的实参太多<br>  <span class="hljs-number">116</span> |     cls = class_create(THIS_MODULE, <span class="hljs-string">&quot;memread_cls&quot;</span>);<br>      |           ^~~~~~~~~~~~<br>.<span class="hljs-regexp">/include/</span>linux<span class="hljs-regexp">/device/</span><span class="hljs-keyword">class</span>.h:<span class="hljs-number">236</span>:<span class="hljs-number">29</span>: 附注：在此声明<br>  <span class="hljs-number">236</span> | struct <span class="hljs-keyword">class</span> * __must_check class_create(const <span class="hljs-keyword">char</span> *name);<br>      |                             ^~~~~~~~~~~~<br><span class="hljs-regexp">/opt/</span>TSB-agent<span class="hljs-regexp">/tss-main/</span>read_sysram/read_sysram.c: 在文件作用域：<br><span class="hljs-regexp">/opt/</span>TSB-agent<span class="hljs-regexp">/tss-main/</span>read_sysram/read_sysram.c:<span class="hljs-number">90</span>:<span class="hljs-number">20</span>: 警告：‘memread_dev’ defined but not used [-Wunused-variable]<br>   <span class="hljs-number">90</span> | <span class="hljs-keyword">static</span> struct cdev memread_dev;<br>      |                    ^~~~~~~~~~~<br><span class="hljs-regexp">/opt/</span>TSB-agent<span class="hljs-regexp">/tss-main/</span>read_sysram/read_sysram.c:<span class="hljs-number">20</span>:<span class="hljs-number">22</span>: 警告：‘per_len’ defined but not used [-Wunused-variable]<br>   <span class="hljs-number">20</span> | <span class="hljs-keyword">static</span> unsigned <span class="hljs-keyword">long</span> per_len  = <span class="hljs-number">1024</span>;<br>      |                      ^~~~~~~<br>cc1：有些警告被当作是错误<br>make[<span class="hljs-number">3</span>]: *** [scripts<span class="hljs-regexp">/Makefile.build:243：/</span>opt<span class="hljs-regexp">/TSB-agent/</span>tss-main<span class="hljs-regexp">/read_sysram/</span>read_sysram.o] 错误 <span class="hljs-number">1</span><br>make[<span class="hljs-number">2</span>]: *** [<span class="hljs-regexp">/usr/</span>src<span class="hljs-regexp">/kernels/</span><span class="hljs-number">6.6</span>.<span class="hljs-number">0</span>-<span class="hljs-number">111.0</span>.<span class="hljs-number">0.114</span>.oe2403sp1.aarch64<span class="hljs-regexp">/Makefile:1924：/</span>opt<span class="hljs-regexp">/TSB-agent/</span>tss-main/read_sysram] 错误 <span class="hljs-number">2</span><br>make[<span class="hljs-number">1</span>]: *** [Makefile:<span class="hljs-number">234</span>：__sub-make] 错误 <span class="hljs-number">2</span><br>make[<span class="hljs-number">1</span>]: 离开目录“<span class="hljs-regexp">/usr/</span>src<span class="hljs-regexp">/kernels/</span><span class="hljs-number">6.6</span>.<span class="hljs-number">0</span>-<span class="hljs-number">111.0</span>.<span class="hljs-number">0.114</span>.oe2403sp1.aarch64”<br>make: *** [Makefile:<span class="hljs-number">9</span>：all] 错误 <span class="hljs-number">2</span><br></code></pre></td></tr></table></figure>
+<p>只需要将操作系统版本安装正确即可，否则后面还会出现其他报错（过来人的经验😂）</p>
+<h2 id="tss-编译">tss 编译</h2>
+<p>进入到tss-main/read_sysram/目录下，执行： make 进入到tss-main/tcf/scripts 目录下，执行：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">./tcs-com.sh [debug|release] <br>./tcf-com.sh [debug|release]<br></code></pre></td></tr></table></figure>
+<h2 id="tsb-编译">tsb 编译</h2>
+<p>符号表拷贝：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">cp -rf tss-main/tcf/scripts/tss/kernel/tcsexModule.symvers tsb/kernel/platform/tcsModule.symvers<br></code></pre></td></tr></table></figure>
+<p>进入到tsb目录下，执行：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">./build_tsb.sh enable_white_not_tpcm<br></code></pre></td></tr></table></figure>
+<h2 id="ttm-编译">ttm 编译</h2>
+<p>再进入项目根目录拷贝依赖库：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs shell">mkdir -p ttm/platform_term/depend/lib mkdir-p ttm/platform_term/build/ttm/bin <br>cp tss-main/tcf/scripts/tss/user/libhttctcf.so ttm/platform_term/depend/lib/ <br>cp tss-main/tcf/scripts/tss/user/libhttctcs.so ttm/platform_term/depend/lib/ <br>cp tsb/tsb/libhttctsb.so ttm/platform_term/depend/lib/ <br>cp tss-main/tcf/scripts/tss/user/libhttcutils.so ttm/platform_term/depend/lib/ <br>cp tss-main/tcf/scripts/tss/user/tcm-lib/lib/libtcm.so ttm/platform_term/depend/lib/<br></code></pre></td></tr></table></figure>
+<p>进入到<code>ttm/platform_term/agent/</code>目录下，执行：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">make clean;make <br>make install<br></code></pre></td></tr></table></figure>
+<h1 id="02-部署运行">02 部署运行</h1>
+<h2 id="部署安装">部署安装</h2>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs awk">mkdir -p <span class="hljs-regexp">/usr/</span>local<span class="hljs-regexp">/httcsec/</span>conf<br>mkdir -p <span class="hljs-regexp">/usr/</span>local<span class="hljs-regexp">/httcsec/</span>lib<br>mkdir -p <span class="hljs-regexp">/usr/</span>local<span class="hljs-regexp">/httcsec/</span>log<br><br>cp -rf tss-main<span class="hljs-regexp">/tcf/</span>scripts<span class="hljs-regexp">/tss /u</span>sr<span class="hljs-regexp">/local/</span>httcsec/<br>cp -rf proxy<span class="hljs-regexp">/tpcmproxy /u</span>sr<span class="hljs-regexp">/local/</span>httcsec<span class="hljs-regexp">/tss/</span><br>cp -rf tss-main<span class="hljs-regexp">/read_sysram/</span>read_sysram.ko <span class="hljs-regexp">/usr/</span>local<span class="hljs-regexp">/httcsec/</span>tss<span class="hljs-regexp">/kernel/</span><br>cp -rf tsb<span class="hljs-regexp">/tsb /u</span>sr<span class="hljs-regexp">/local/</span>httcsec/<br>cp -rf ttm<span class="hljs-regexp">/platform_term/</span>build<span class="hljs-regexp">/ttm /u</span>sr<span class="hljs-regexp">/local/</span>httcsec/<br><br>cp <span class="hljs-regexp">/usr/</span>local<span class="hljs-regexp">/httcsec/</span>tss<span class="hljs-regexp">/user/</span>lib* <span class="hljs-regexp">/usr/</span>local<span class="hljs-regexp">/httcsec/</span>lib-frd<br>cp <span class="hljs-regexp">/usr/</span>local<span class="hljs-regexp">/httcsec/</span>tss<span class="hljs-regexp">/user/</span>tcm-lib<span class="hljs-regexp">/lib/</span>* <span class="hljs-regexp">/usr/</span>local<span class="hljs-regexp">/httcsec/</span>lib-frd<br>cp <span class="hljs-regexp">/usr/</span>local<span class="hljs-regexp">/httcsec/</span>tsb<span class="hljs-regexp">/libhttctsb.so /u</span>sr<span class="hljs-regexp">/local/</span>httcsec/lib-frd<br>chmod +x <span class="hljs-regexp">/usr/</span>local<span class="hljs-regexp">/httcsec/</span>tss/srv<br>chmod +x <span class="hljs-regexp">/usr/</span>local<span class="hljs-regexp">/httcsec/</span>tsb/srv<br>chmod +x <span class="hljs-regexp">/usr/</span>local<span class="hljs-regexp">/httcsec/</span>ttm/srv<br></code></pre></td></tr></table></figure>
+<h2 id="初始化">初始化</h2>
+<p>启动tss服务</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">/usr/local/httcsec/tss/srv start <br></code></pre></td></tr></table></figure>
+<p>报错：<br>
+<img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/f4b8b8caa807651fd0d96790ae2e439c.png" srcset="/img/loading.gif" lazyload alt="f4b8b8caa807651fd0d96790ae2e439c"></p>
+<p>全局扫描白名单</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">/usr/local/httcsec/ttm/bin/ht_init scan accuracy_first nounzip <br></code></pre></td></tr></table></figure>
+<p>重置license</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">/usr/local/httcsec/ttm/bin/ht_init reset <br></code></pre></td></tr></table></figure>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20251222194708300.png" srcset="/img/loading.gif" lazyload alt="image-20251222194708300"></p>
+<p>设置管理员</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">/usr/local/httcsec/ttm/bin/ht_init set-admin <br></code></pre></td></tr></table></figure>
+<p>下发全局策略</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">/usr/local/httcsec/ttm/bin/ht_init set-default-policy all <br></code></pre></td></tr></table></figure>
+<p>停止tss服务</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">/usr/local/httcsec/tss/srv stop<br></code></pre></td></tr></table></figure>
+<h2 id="启动服务">启动服务</h2>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">/usr/local/httcsec/ttm/srv start<br></code></pre></td></tr></table></figure>
+<p>报错：</p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/e978631f9a2167194b15b9c612448fa9.png" srcset="/img/loading.gif" lazyload alt="e978631f9a2167194b15b9c612448fa9"></p>
+<h1 id="03-tss-main源码阅读">03 tss-main源码阅读</h1>
+<p>总体结构</p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">- tss-main<br>  |<span class="hljs-string"></span><br><span class="hljs-string">  +-- httcutils/                          // 通用工具库，提供底层数据结构和算法封装</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   +-- include/httcutils/              // 头文件目录</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- list.h                       // 双向链表定义，Linux 内核风格</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- array.h                      // 动态数组操作接口</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- rbtree.h                     // 红黑树定义，用于高效查找</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- jhash.h                      // Jenkins Hash 算法定义</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- mem.h                        // 内存管理封装（分配/释放/清零）</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- file.h                       // 文件读写操作封装</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- debug.h                      // 调试日志宏定义</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- sem.h                        // 信号量/锁机制封装</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- sm2.h/sm3.h/sm4.h            // 国密算法头文件</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<br>  |<span class="hljs-string">   +-- src/                            // 源代码目录</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       -- list.c                       // (通常链表实现在头文件中，或此处包含扩展实现)</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       -- array.c                      // 动态数组实现</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       -- jhash.c                      // Hash 算法实现</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       -- mem.c                        // 内存管理实现</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       -- file.c                       // 文件操作实现</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       -- debug.c                      // 调试功能实现</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       +-- sm/                         // 国密算法软实现目录</span><br><span class="hljs-string">  </span>|<span class="hljs-string">           -- sm2.c                    // SM2 非对称加密/签名软算法</span><br><span class="hljs-string">  </span>|<span class="hljs-string">           -- sm3.c                    // SM3 哈希摘要软算法</span><br><span class="hljs-string">  </span>|<span class="hljs-string">           -- sm4.c                    // SM4 对称加密软算法</span><br><span class="hljs-string">  </span>|<span class="hljs-string">           -- ecc.c                    // 椭圆曲线基础数学运算</span><br><span class="hljs-string">  </span>|<br>  +-- tcs/                                // 核心服务层 (Trusted Core Services)<br>  |<span class="hljs-string">   +-- include/                        // TCS 公共头文件</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   +-- tcsapi/                     // 对外暴露的核心 API 定义</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tcs_bmeasure.h           // 启动度量相关 API</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tcs_attest.h             // 远程证明相关 API</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tcs_key.h                // 密钥管理相关 API</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tcs_auth.h               // 授权与认证 API</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tcs_policy.h             // 策略管理 API</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tcs_tpcm.h               // TPCM 芯片管理 API</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tpcm_command.h               // TPCM 硬件指令结构体定义</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<br>  |<span class="hljs-string">   +-- tcsapi/                         // TCS 接口实现</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   +-- tcsu/                       // 用户态库实现 (libtcs.so)</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tcs.c                    // 库初始化，设备文件句柄管理</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- transmit.c               // 核心传输函数，封装 ioctl 发送命令到内核</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tcs_attest.c             // 远程证明接口的用户态实现</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tcs_key.c                // 密钥管理接口的用户态实现</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tcs_*.c                  // 其他各项 API 的参数打包实现</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<br>  |<span class="hljs-string">   </span>|<span class="hljs-string">   +-- tcsk/                       // 内核态模块实现 (tcs.ko)</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">       -- tcs.c                    // 内核模块入口，注册字符设备，ioctl 分发处理</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">       -- kutils.c                 // 内核态辅助工具函数</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">       -- tcs_auth.c               // 内核侧权限检查逻辑</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">       -- tcs_key.c                // 内核侧密钥加载与保护逻辑</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">       -- smk/                     // 内核态使用的国密算法实现</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<br>  |<span class="hljs-string">   +-- tdd/                            // 可信设备驱动 (Trusted Device Driver)</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tdd.c                        // 驱动入口，字符设备注册</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tdd_tpcm.c                   // TPCM 芯片的具体物理通信逻辑</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- comm_driver.c                // 底层通信协议实现</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<br>  |<span class="hljs-string">   +-- tddl/                           // 驱动库接口层 (Trusted Device Driver Library)</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tddl.h                       // TDDL 接口定义</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tpcm_tddl.c                  // 针对 TPCM 设备的指令封装实现</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tcm_tddl.c                   // 针对 TCM 设备的指令封装实现</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<br>  |<span class="hljs-string">   +-- tcm/                            // TCM 协议栈 (可选/遗留支持)</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   +-- lib/                        // TCM 2.0 协议的序列化/反序列化库</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<br>  |<span class="hljs-string">   +-- mocktsb/                        // 仿真环境</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       -- tsb_admin.c                  // 模拟管理功能的桩代码</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       -- tsb_measure_user.c           // 模拟度量功能的桩代码</span><br><span class="hljs-string">  </span>|<br>  +-- tcf/                                // 框架层 (Trusted Computing Framework)<br>  |<span class="hljs-string">   +-- include/tcfapi/                 // 业务层高级 API 定义</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tcf_file_integrity.h         // 文件完整性校验接口</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tcf_process.h                // 进程白名单接口</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tcf_config.h                 // 配置文件解析接口</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<br>  |<span class="hljs-string">   +-- src/                            // 框架业务逻辑实现</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tcf.c                        // 框架初始化</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tcf_config.c                 // 策略配置文件 (.cfg/xml) 解析逻辑</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tcf_file_integrity.c         // 实现完整性基线比对逻辑</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tcf_attest.c                 // 封装复杂的证明流程</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- tcf_log_notice.c             // 审计日志与报警处理</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<br>  |<span class="hljs-string">   +-- utils/                          // 命令行工具源码</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- get_trust_status.c           // 工具：获取当前可信状态</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   -- generate_trust_report.c      // 工具：生成可信报告</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<br>  |<span class="hljs-string">   +-- scripts/                        // 辅助脚本</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       -- tcf-test.sh                  // 自动化测试脚本</span><br><span class="hljs-string">  </span>|<br>  +-- read_sysram/                        // 独立工具<br>      -- read_sysram.c                    // 读取系统 RAM 信息，可能用于辅助内存度量<br></code></pre></td></tr></table></figure>
+<h2 id="tss-main-httcutils">tss-main/httcutils</h2>
+<p>它提供了一套独立于业务的通用 C 语言工具函数，供上层（TCS、TCF）调用。</p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">- tss-main/httcutils/<br>  |<span class="hljs-string"></span><br><span class="hljs-string">  +-- Makefile                        // 构建脚本，定义如何编译整个工具库为 libhttcutils.a 或 .so</span><br><span class="hljs-string">  </span>|<br>  +-- include/httcutils/              // 【对外头文件】上层代码引用工具库时包含的头文件<br>  |<span class="hljs-string">   </span>|<span class="hljs-string">-- array.h                     // 动态数组（Dynamic Array）接口定义。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">                               // 作用：提供类似 C++ vector 的功能，支持自动扩容的数组操作。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- convert.h                   // 数据转换工具宏/函数定义。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">                               // 作用：处理字节序转换（大小端）、十六进制字符串与字节流互转等。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- debug.h                     // 调试日志宏定义。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">                               // 作用：定义 httc_log, httc_debug 等宏，统一控制日志打印格式和级别。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- file.h                      // 文件 I/O 操作封装。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">                               // 作用：提供简化的文件读写接口，如“一次性读整个文件”或“写入并同步”。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- jhash.h                     // Jenkins Hash 算法定义。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">                               // 作用：一种快速的哈希函数，常用于哈希表（Hash Table）的索引计算，而非加密。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- list.h                      // 双向链表（Doubly Linked List）定义。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">                               // 作用：直接移植自 Linux 内核的链表实现，用于高效管理策略列表、对象集合。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- mem.h                       // 内存管理封装。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">                               // 作用：包装 malloc/free，增加内存清零（zalloc）功能，防止敏感数据残留在内存中。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- offset.h                    // 偏移量计算宏。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">                               // 作用：包含 offsetof, container_of 等标准宏，用于结构体成员访问。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- sem.h                       // 信号量（Semaphore）与锁机制封装。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">                               // 作用：封装 pthread 互斥锁或信号量，用于多线程并发控制。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- sm2.h                       // 国密 SM2 算法头文件。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">                               // 作用：定义 SM2 签名、验签、加密、解密的函数原型和密钥结构。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- sm3.h                       // 国密 SM3 算法头文件。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">                               // 作用：定义 SM3 哈希计算的上下文（Context）和函数原型。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- sm4.h                       // 国密 SM4 算法头文件。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">                               // 作用：定义 SM4 对称加密算法的密钥设置和加解密函数原型。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- sys.h                       // 系统级操作封装。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">                               // 作用：获取系统信息（如 CPU、内存）、执行系统命令等底层操作的抽象。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- types.h                     // 基础数据类型定义。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">                               // 作用：定义 u8, u32, uint64_t 等跨平台类型，保证位宽一致。</span><br><span class="hljs-string">  </span>|<br>  +-- src/                            // 【源代码】上述头文件的具体实现<br>      |<span class="hljs-string">-- array.c                     // 动态数组的具体逻辑实现（扩容、插入、删除）。</span><br><span class="hljs-string">      </span>|<span class="hljs-string">-- debug.c                     // 调试日志功能的实现（日志级别控制、输出到 stderr/syslog）。</span><br><span class="hljs-string">      </span>|<span class="hljs-string">-- file.c                      // 文件操作的具体实现（httc_util_file_read_full 等）。</span><br><span class="hljs-string">      </span>|<span class="hljs-string">-- jhash.c                     // Jenkins Hash 算法的数学实现。</span><br><span class="hljs-string">      </span>|<span class="hljs-string">-- mem.c                       // 内存管理函数的实现（httc_malloc, httc_free 等）。</span><br><span class="hljs-string">      </span>|<span class="hljs-string">-- sem.c                       // 信号量操作的封装实现。</span><br><span class="hljs-string">      </span>|<span class="hljs-string">-- sys.c                       // 系统操作函数的实现。</span><br><span class="hljs-string">      </span>|<span class="hljs-string">-- util.c                      // 其他杂项工具函数（如字符串处理、随机数获取辅助）。</span><br><span class="hljs-string">      </span>|<br>      +-- sm/                         // 【核心子目录】国密算法的纯软件实现（Soft Implementation）<br>          |<span class="hljs-string">                           // 当没有硬件加速卡（TPCM）时，或者在计算非敏感数据的哈希时使用。</span><br><span class="hljs-string">          </span>|<span class="hljs-string">-- Makefile.objs           // 定义该子目录编译目标的辅助文件。</span><br><span class="hljs-string">          </span>|<span class="hljs-string">-- sub.mk                  // 子模块构建规则。</span><br><span class="hljs-string">          </span>|<span class="hljs-string">-- ecc.c / ecc.h           // 椭圆曲线密码学（ECC）基础数学运算库。</span><br><span class="hljs-string">          </span>|<span class="hljs-string">                           // 作用：SM2 是基于 ECC 的，这里实现了点乘、点加等基础数学运算。</span><br><span class="hljs-string">          </span>|<span class="hljs-string">-- sm2.c                   // SM2 算法的具体逻辑实现。</span><br><span class="hljs-string">          </span>|<span class="hljs-string">                           // 作用：实现了国密公钥密码算法，用于非对称加解密和签名。</span><br><span class="hljs-string">          </span>|<span class="hljs-string">-- sm3.c                   // SM3 算法的具体逻辑实现。</span><br><span class="hljs-string">          </span>|<span class="hljs-string">                           // 作用：实现了国密哈希算法（类似 SHA-256），用于计算完整性摘要。</span><br><span class="hljs-string">          </span>|<span class="hljs-string">-- sm3_impl.h              // SM3 内部宏和常数定义，不对外暴露。</span><br><span class="hljs-string">          </span>|<span class="hljs-string">-- sm4.c                   // SM4 算法的具体逻辑实现。</span><br><span class="hljs-string">          </span>|<span class="hljs-string">                           // 作用：实现了国密分组密码算法（类似 AES），用于数据加密。</span><br></code></pre></td></tr></table></figure>
+<h2 id="核心服务层-tss-main-tcs">核心服务层 tss-main/tcs</h2>
+<h3 id="tcs-tdd">tcs/tdd</h3>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs awk">- tss-main<span class="hljs-regexp">/tcs/</span>tdd/<br>  |<br>  |-- tdd.c <span class="hljs-regexp">/ tdd.h                   /</span>/ 【驱动入口与骨架】<br>  |                                   <span class="hljs-regexp">//</span> 作用：Linux 字符设备驱动的标准框架。<br>  |                                   <span class="hljs-regexp">//</span> 关键逻辑：<br>  |                                   <span class="hljs-regexp">//</span> <span class="hljs-number">1</span>. module_init/<span class="hljs-keyword">exit</span>: 负责加载和卸载 tcs.ko 内核模块。<br>  |                                   <span class="hljs-regexp">//</span> <span class="hljs-number">2</span>. device_create: 创建设备文件节点 (通常是 <span class="hljs-regexp">/dev/</span>tcs 或 <span class="hljs-regexp">/dev/</span>tcm)。<br>  |                                   <span class="hljs-regexp">//</span> <span class="hljs-number">3</span>. file_operations: 定义 open, release, ioctl 等文件操作。<br>  |                                   <span class="hljs-regexp">//</span>    当上层调用 ioctl 时，请求会从这里进入驱动。<br>  |<br>  |-- tdd_tpcm.c <span class="hljs-regexp">/ tdd_tpcm.h         /</span>/ 【硬件通信核心逻辑】<br>  |                                   <span class="hljs-regexp">//</span> 作用：实现了针对 TPCM 芯片的具体通信协议。<br>  |                                   <span class="hljs-regexp">//</span> 关键逻辑：<br>  |                                   <span class="hljs-regexp">//</span> <span class="hljs-number">1</span>. 物理层读写：通过 SPI<span class="hljs-regexp">/LPC/</span>I2C 总线读写芯片的状态寄存器 (Status Register) 和数据寄存器 (Data Register)。<br>  |                                   <span class="hljs-regexp">//</span> <span class="hljs-number">2</span>. 协议握手：实现“等待就绪”、“发送命令头”、“发送数据体”、“等待完成”、“读取响应”的时序状态机。<br>  |                                   <span class="hljs-regexp">//</span> <span class="hljs-number">3</span>. 它是真正“摸”到硬件代码的地方。<br>  |<br>  |-- comm_driver.c <span class="hljs-regexp">/ comm_driver.h   /</span>/ 【通信接口抽象】<br>  |                                   <span class="hljs-regexp">//</span> 作用：对底层物理总线（Interface）的封装。<br>  |                                   <span class="hljs-regexp">//</span> 场景：TPCM 可能挂在 SPI 总线上，也可能挂在 LPC 总线上。<br>  |                                   <span class="hljs-regexp">//</span>        这个文件负责探测底层具体的总线类型，并提供统一的 read_byte/write_byte 接口给 tdd_tpcm.c 使用。<br>  |<br>  |-- cmd_man.c <span class="hljs-regexp">/ cmd_man.h           /</span>/ 【命令管理器 (Command Manager)】<br>  |                                   <span class="hljs-regexp">//</span> 作用：负责管理并发的命令请求。<br>  |                                   <span class="hljs-regexp">//</span> 关键逻辑：<br>  |                                   <span class="hljs-regexp">//</span> <span class="hljs-number">1</span>. 互斥锁 (Mutex): TPCM 芯片同一时间只能处理一个命令。这个文件保证多进程同时调用 TSB 时，命令能排队执行，不会冲突。<br>  |                                   <span class="hljs-regexp">//</span> <span class="hljs-number">2</span>. 超时控制: 防止硬件卡死导致驱动永久等待。<br>  |<br>  |-- netlink.c                       <span class="hljs-regexp">//</span> 【异步通知机制】<br>  |                                   <span class="hljs-regexp">//</span> 作用：实现 Kernel 到 User Space 的异步消息推送。<br>  |                                   <span class="hljs-regexp">//</span> 场景：当 TPCM 硬件产生中断（例如检测到物理入侵、完整性校验失败）时，<br>  |                                   <span class="hljs-regexp">//</span>        驱动通过 Netlink Socket 主动发消息给用户态的守护进程（如 tsb_admin 或审计进程），而不是被动等待 ioctl。<br>  |<br>  |-- ft_tpcm.h                       <span class="hljs-regexp">//</span> 【特定硬件定义】<br>  |                                   <span class="hljs-regexp">//</span> 作用：可能包含飞腾 (Phytium/FT) 平台特定的 TPCM 硬件定义或寄存器地址映射。<br>  |<br>  |-- msg.h                           <span class="hljs-regexp">//</span> 【消息结构定义】<br>  |                                   <span class="hljs-regexp">//</span> 作用：定义了驱动内部传递的消息结构体。<br></code></pre></td></tr></table></figure>
+<h4 id="cmd-man-c">cmd_man.c</h4>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/init.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/module.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/miscdevice.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/kernel.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/errno.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/mm.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/uaccess.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/fs.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/slab.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/vmalloc.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/spinlock_types.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/atomic.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;asm/io.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;cmd_man.h&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;tdd_tpcm.h&quot;</span></span><br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">share_memory_area</span>&#123;</span><br>	<span class="hljs-type">int</span> offset;<br>	<span class="hljs-type">int</span> unit_size;<br>	<span class="hljs-type">int</span> size;<br>&#125;;<br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> BUFFER_AREA_NUM 10</span><br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">share_memory_area</span> <span class="hljs-title">areas</span>[<span class="hljs-title">BUFFER_AREA_NUM</span>] =</span> &#123;<br>		&#123;<span class="hljs-number">0x200000</span>,<span class="hljs-number">0x1000</span>,<span class="hljs-number">0x200000</span>&#125;,<span class="hljs-comment">//4k,2m</span><br>		&#123;<span class="hljs-number">0x400000</span>,<span class="hljs-number">0x2000</span>,<span class="hljs-number">0x200000</span>&#125;,<span class="hljs-comment">//8K</span><br>		&#123;<span class="hljs-number">0x600000</span>,<span class="hljs-number">0x4000</span>,<span class="hljs-number">0x200000</span>&#125;,<span class="hljs-comment">//16K</span><br>		&#123;<span class="hljs-number">0x800000</span>,<span class="hljs-number">0x8000</span>,<span class="hljs-number">0x200000</span>&#125;,<span class="hljs-comment">//32K</span><br>		&#123;<span class="hljs-number">0xA00000</span>,<span class="hljs-number">0x10000</span>,<span class="hljs-number">0x200000</span>&#125;,<span class="hljs-comment">//64K</span><br>		&#123;<span class="hljs-number">0xC00000</span>,<span class="hljs-number">0x20000</span>,<span class="hljs-number">0x200000</span>&#125;,<span class="hljs-comment">//128K</span><br>		&#123;<span class="hljs-number">0xE00000</span>,<span class="hljs-number">0x40000</span>,<span class="hljs-number">0x200000</span>&#125;,<span class="hljs-comment">//256K</span><br>		&#123;<span class="hljs-number">0x1000000</span>,<span class="hljs-number">0x80000</span>,<span class="hljs-number">0x200000</span>&#125;,<span class="hljs-comment">//256K</span><br>		&#123;<span class="hljs-number">0x1200000</span>,<span class="hljs-number">0x100000</span>,<span class="hljs-number">0x400000</span>&#125;,<span class="hljs-comment">//1m,4m</span><br>		&#123;<span class="hljs-number">0x1600000</span>,<span class="hljs-number">0x200000</span>,<span class="hljs-number">0x800000</span>&#125;<span class="hljs-comment">//2m,8m</span><br>&#125;;<br><span class="hljs-meta">#<span class="hljs-keyword">define</span> TPCM_BUFFER_AREA_OFFSET 	  0x200000<span class="hljs-comment">//2M</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> TPCM_BUFFER_AREA_SIZE  	    0x1C00000<span class="hljs-comment">//28M</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> TPCM_CMD_HEADER_AREA_OFFSET 0x1E00000<span class="hljs-comment">//30M</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> TPCM_CMD_HEADER_AREA_SIZE  	 0x100000<span class="hljs-comment">//1M</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> TPCM_SHARE_MEMORY_SIZE 		0x1F00000<span class="hljs-comment">//31M</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_BUFFER_NUMBER (TPCM_CMD_HEADER_AREA_SIZE/sizeof(struct cmd_header ))</span><br><br><span class="hljs-type">void</span> *sharemem_base;<br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">cmd_header</span> * <span class="hljs-title">cmd_header_base</span>;</span><br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">share_memory</span> * <span class="hljs-title">share_memory_base</span>;</span><br><span class="hljs-type">void</span> * data_buffer_base;<br><span class="hljs-type">void</span> * data_buffer_end;<br><span class="hljs-type">short</span> cmd_headers[CMD_BUFFER_NUMBER];<br><span class="hljs-type">short</span> buffer_next[BUFFER_AREA_NUM];<br><span class="hljs-comment">//void *data_buffer_base[BUFFER_AREA_NUM];</span><br><span class="hljs-type">short</span> *buffer_head[BUFFER_AREA_NUM];<br><br><span class="hljs-type">int</span> cmd_next = CMD_BUFFER_NUMBER - <span class="hljs-number">1</span>;<br><br><span class="hljs-type">static</span> <span class="hljs-title function_">DEFINE_SPINLOCK</span><span class="hljs-params">(buffer_lock)</span>;<br><br><span class="hljs-type">int</span> <span class="hljs-title function_">shm_init</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span>&#123;<br>	<span class="hljs-type">int</span> i,j;<br>	<span class="hljs-type">int</span> num,r,ret;<br>	<span class="hljs-comment">//sharemem_base = ioremap_nocache(</span><br>	<span class="hljs-comment">//		(unsigned long)TPCM_SHARE_BUFFER, (unsigned long)TPCM_SHARE_MEMORY_SIZE);</span><br>	sharemem_base = vmalloc(TPCM_SHARE_MEMORY_SIZE);<br>	<span class="hljs-keyword">if</span> (!sharemem_base)&#123;<br>		ret = -ENOMEM;<br>		<span class="hljs-keyword">return</span> ret;<br>	&#125;<br>	share_memory_base = sharemem_base;<br>	cmd_header_base = sharemem_base + TPCM_CMD_HEADER_AREA_OFFSET;<br>	data_buffer_base = sharemem_base + TPCM_BUFFER_AREA_OFFSET;<br>	data_buffer_end = data_buffer_base + TPCM_BUFFER_AREA_SIZE;<br>	<span class="hljs-comment">//huge_data_buffer_base = sharemem_base + TPCM_HUGE_DATA_BUFFER_OFFSET;</span><br>	<span class="hljs-comment">//huge_data_buffer_end = sharemem_base + TPCM_HUGE_DATA_BUFFER_END ;</span><br>	printk(<span class="hljs-string">&quot;Share memory base = 0x%lx,Command memory base = 0x%lx\n&quot;</span><br>			,(<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)sharemem_base,(<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)cmd_header_base);<br>	printk(<span class="hljs-string">&quot;data_buffer_base = 0x%lx,data_buffer_end= 0x%lx\n&quot;</span>,<br>			(<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)data_buffer_base,(<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)data_buffer_end);<br>	<span class="hljs-keyword">if</span>( sharemem_base == <span class="hljs-number">0</span> )<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br>	<span class="hljs-keyword">for</span>(i=<span class="hljs-number">0</span>;i&lt;CMD_BUFFER_NUMBER;i++)&#123;<br>		cmd_headers[i] = i - <span class="hljs-number">1</span>;<br>	&#125;<br><br>	<span class="hljs-keyword">for</span>(i=<span class="hljs-number">0</span>;i&lt;BUFFER_AREA_NUM;i++)&#123;<br><br>		num =  areas[i].size/areas[i].unit_size;<br>		buffer_next[i] = num <span class="hljs-number">-1</span>;<br>		buffer_head[i] = kmalloc(num * <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">short</span>),GFP_KERNEL);<br>		<span class="hljs-keyword">if</span>(!buffer_head[i])&#123;<br>			printk(<span class="hljs-string">&quot;No memory for share memory management\n&quot;</span>);<br>			r = <span class="hljs-number">-1</span>;<br>			<span class="hljs-keyword">goto</span> error;<br>		&#125;<br>		<span class="hljs-keyword">for</span>(j=<span class="hljs-number">0</span>;j&lt;num;j++)&#123;<br>			buffer_head[i][j] = j - <span class="hljs-number">1</span>;<br>		&#125;<br>	&#125;<br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>error:<br>	<span class="hljs-keyword">for</span>(i=<span class="hljs-number">0</span>;i&lt;BUFFER_AREA_NUM;i++)&#123;<br>		<span class="hljs-keyword">if</span>(buffer_head[i])kfree(buffer_head[i]);<br>	&#125;<br>	<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br><br>&#125;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">shm_exit</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span>&#123;<br>	<span class="hljs-type">int</span> i;<br>	<span class="hljs-keyword">for</span>(i=<span class="hljs-number">0</span>;i&lt;BUFFER_AREA_NUM;i++)&#123;<br>		kfree(buffer_head[i]);<br>	&#125;<br>	vfree(sharemem_base);<br>	<span class="hljs-keyword">return</span>;<br>&#125;<br><br><span class="hljs-type">int</span> <span class="hljs-title function_">tdd_free_cmd_header</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> cmd_header * header)</span>&#123;<br>	<span class="hljs-type">int</span> index;<br>	<span class="hljs-type">int</span> r = <span class="hljs-number">0</span>;<br>	index = ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)header - (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)cmd_header_base)/<span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> cmd_header);<br>	<span class="hljs-keyword">if</span>(index &lt; <span class="hljs-number">0</span> || index &gt;= CMD_BUFFER_NUMBER)&#123;<br>		printk(<span class="hljs-string">&quot;[%s:%d] hter command header address %p\n&quot;</span>,__func__, __LINE__,header);<br>		<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br>	&#125;<br>	spin_lock(&amp;buffer_lock);<br>	<span class="hljs-keyword">if</span>(cmd_headers[index] != <span class="hljs-number">-2</span>)&#123;<br>		printk(<span class="hljs-string">&quot;Duplicated Free command header at index %d\n&quot;</span>,index);<br>		r = <span class="hljs-number">-1</span>;<br>	&#125;<br>	<span class="hljs-keyword">else</span>&#123;<br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> __DEBUG__</span><br>		printk(<span class="hljs-string">&quot;Free command header at index %d\n&quot;</span>,index);<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>		cmd_headers[index] = cmd_next;<br>		cmd_next = index;<br>	&#125;<br>	spin_unlock(&amp;buffer_lock);<br>	<span class="hljs-keyword">return</span> r;<br>&#125;<br>EXPORT_SYMBOL_GPL(tdd_free_cmd_header);<br><br><span class="hljs-keyword">struct</span> cmd_header *<span class="hljs-title function_">tdd_alloc_cmd_header</span><span class="hljs-params">(<span class="hljs-type">void</span> )</span>&#123;<br>	<span class="hljs-type">int</span> index;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">cmd_header</span> *<span class="hljs-title">cmd</span> =</span> <span class="hljs-number">0</span>;<br>	spin_lock(&amp;buffer_lock);<br>	<span class="hljs-keyword">if</span>(cmd_next != <span class="hljs-number">-1</span>)&#123;<br>		index = cmd_next;<br>		cmd_next = cmd_headers[index];<br>		cmd_headers[index] = <span class="hljs-number">-2</span>;<span class="hljs-comment">//set to in use</span><br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> __DEBUG__</span><br>		printk(<span class="hljs-string">&quot;Get command at index %d\n&quot;</span>,index);<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>		cmd =  cmd_header_base + index;<br>	&#125;<br>	spin_unlock(&amp;buffer_lock);<br>	<span class="hljs-keyword">return</span> cmd;<br>&#125;<br>EXPORT_SYMBOL_GPL(tdd_alloc_cmd_header);<br><br><span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> <span class="hljs-title function_">tdd_get_phys_addr</span><span class="hljs-params">(<span class="hljs-type">void</span> *buffer)</span>&#123;<br>	<span class="hljs-keyword">if</span>(buffer &gt;= sharemem_base + TPCM_SHARE_MEMORY_SIZE<br>		|| buffer &lt; sharemem_base)<br>	&#123;<br>		<span class="hljs-keyword">return</span> (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)buffer;<br>	&#125;<br><span class="hljs-comment">//	printk(&quot;----tdd_get_phys_addr: %d---\n&quot;, buffer - sharemem_base);</span><br>	<span class="hljs-keyword">return</span> buffer - sharemem_base;<span class="hljs-comment">//返回buffer - sharemem_base</span><br>&#125;<br>EXPORT_SYMBOL_GPL(tdd_get_phys_addr);<br><br><span class="hljs-type">static</span> <span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title function_">get_area_point</span><span class="hljs-params">(<span class="hljs-type">void</span> *buffer)</span>&#123;<br>	<span class="hljs-type">int</span> i;<br>	<span class="hljs-keyword">for</span>(i = <span class="hljs-number">0</span> ; i&lt; BUFFER_AREA_NUM <span class="hljs-number">-1</span>  ;i++)&#123;<br>		<span class="hljs-keyword">if</span>(buffer &lt; sharemem_base + areas[i + <span class="hljs-number">1</span>].offset)&#123;<br>			<span class="hljs-keyword">break</span>;<br>		&#125;<br>	&#125;<br><br>	<span class="hljs-keyword">return</span> i;<br>&#125;<br><br><span class="hljs-type">int</span> <span class="hljs-title function_">tdd_free_data_buffer</span><span class="hljs-params">(<span class="hljs-type">void</span> *buffer)</span>&#123;<br>	<span class="hljs-type">int</span> area,diff,index,r = <span class="hljs-number">0</span>;<br>	<span class="hljs-keyword">if</span>(buffer &gt;= data_buffer_end)&#123;<br>		printk(<span class="hljs-string">&quot;[%s:%d]Free data buffer  hter 1 %p\n&quot;</span>,__func__, __LINE__,buffer);<br>		<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br>	&#125;<br>	<span class="hljs-keyword">if</span>(buffer &lt; data_buffer_base)&#123;<br>		printk(<span class="hljs-string">&quot;[%s:%d]Free data buffer   hter 2 %p,data_buffer_base=%p\n&quot;</span>,__func__, __LINE__,buffer,data_buffer_base);<br>		<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br>	&#125;<br>	area  = get_area_point(buffer);<br>	diff = buffer -(sharemem_base + areas[area].offset);<br>	<span class="hljs-keyword">if</span>(diff % areas[area].unit_size)&#123;<br>		printk(<span class="hljs-string">&quot;[%s:%d]Free  data align  hter , area = %d,address =  %p\n&quot;</span>,__func__, __LINE__,area,buffer);<br>		<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br>	&#125;<br>	index = diff/areas[area].unit_size;<br><br>	spin_lock(&amp;buffer_lock);<br>	<span class="hljs-keyword">if</span>(buffer_head[area][index] != <span class="hljs-number">-2</span>)&#123;<br>		printk(<span class="hljs-string">&quot;Duplicated freee data buffer at area %d, index %d\n&quot;</span>,area,index);<br>		r = <span class="hljs-number">-1</span>;<br>	&#125;<br>	<span class="hljs-keyword">else</span>&#123;<br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> __DEBUG__</span><br>		printk(<span class="hljs-string">&quot;Free data buffer at area %d, index %d\n&quot;</span>,area,index);<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>		buffer_head[area][index] = buffer_next[area];<br>		buffer_next[area] = index;<br>	&#125;<br>	spin_unlock(&amp;buffer_lock);<br><br>	<span class="hljs-keyword">return</span> r;<br>&#125;<br>EXPORT_SYMBOL_GPL(tdd_free_data_buffer);<br><br><span class="hljs-type">static</span> <span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title function_">get_area</span><span class="hljs-params">(<span class="hljs-type">int</span> size)</span>&#123;<br>	<span class="hljs-type">int</span> i;<br>	<span class="hljs-keyword">for</span>(i = <span class="hljs-number">0</span> ; i&lt; BUFFER_AREA_NUM <span class="hljs-number">-1</span>  ;i++)&#123;<br>		<span class="hljs-keyword">if</span>(size &lt;= areas[i].unit_size)&#123;<br>			<span class="hljs-keyword">break</span>;<br>		&#125;<br>	&#125;<br>	<span class="hljs-keyword">return</span> i;<br>&#125;<br><br><span class="hljs-type">void</span>  *<span class="hljs-title function_">tdd_alloc_data_buffer</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> size)</span>&#123;<br>	<span class="hljs-type">int</span> area,index;<br>	<span class="hljs-type">void</span> *buf = <span class="hljs-number">0</span>;<br>	<span class="hljs-keyword">if</span>(size == <span class="hljs-number">0</span> || size &gt; areas[BUFFER_AREA_NUM - <span class="hljs-number">1</span>].unit_size)&#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>	&#125;<br>	area = get_area(size);<br>	spin_lock(&amp;buffer_lock);<br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> __DEBUG__</span><br>	printk(<span class="hljs-string">&quot;Try to Alloc size = %x,area = %d\n&quot;</span>,size,area);<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>	<span class="hljs-keyword">for</span>(;area &lt; BUFFER_AREA_NUM ;area++)&#123;<br>		<span class="hljs-keyword">if</span>(buffer_next[area] != <span class="hljs-number">-1</span>)&#123;<br>			index = buffer_next[area];<br>			buffer_next[area] = buffer_head[area][index];<br>			buffer_head[area][index] = <span class="hljs-number">-2</span>;<span class="hljs-comment">//set to in use</span><br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> __DEBUG__</span><br>			printk(<span class="hljs-string">&quot;Get Buffer size=%x,at  area %d,index %d\n&quot;</span>,size,area,index);<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>			buf = sharemem_base  + areas[area].offset<br>					+ index * areas[area].unit_size;<br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> __DEBUG__</span><br>			printk(<span class="hljs-string">&quot;Get buf = %p\n&quot;</span>,buf);<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>			<span class="hljs-keyword">break</span>;<br>		&#125;<br>	&#125;<br>	spin_unlock(&amp;buffer_lock);<br>	<span class="hljs-keyword">return</span> buf;<br>&#125;<br>EXPORT_SYMBOL_GPL(tdd_alloc_data_buffer);<br><br><span class="hljs-type">void</span> *<span class="hljs-title function_">tdd_alloc_data_buffer_api</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> size)</span><br>&#123;<br>    <span class="hljs-keyword">return</span> tdd_alloc_data_buffer (size);<br>&#125;<br>EXPORT_SYMBOL_GPL(tdd_alloc_data_buffer_api);<br></code></pre></td></tr></table></figure>
+<h4 id="tdd-tpcm-c">tdd_tpcm.c</h4>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/kernel.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/module.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/delay.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/sched.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;msg.h&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;tdd.h&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;tdd_tpcm.h&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;cmd_man.h&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PID 1</span><br><br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">share_memory</span> * <span class="hljs-title">share_memory_begin</span>;</span><br><br><span class="hljs-type">static</span> <span class="hljs-title function_">DEFINE_MUTEX</span><span class="hljs-params">(mutex)</span>;<br><br><span class="hljs-type">int</span> <span class="hljs-title function_">send_command</span><span class="hljs-params">(<span class="hljs-type">int</span> cmd_type,<span class="hljs-type">int</span> cmd_length,<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> cmd_sequence, <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> cmd_addr_phys, <span class="hljs-type">int</span> *cmd_ret)</span>&#123;<br>   <br>	<span class="hljs-comment">//u32 pid = PID;</span><br>	<span class="hljs-comment">//int length;</span><br>	<span class="hljs-type">int</span> r;<br>	<span class="hljs-type">int</span> i;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> proxypid = <span class="hljs-number">0</span>;<br>    <br>	mutex_lock (&amp;mutex);<span class="hljs-comment">//加锁，进入临界区</span><br>    <br>	share_memory_begin = (<span class="hljs-keyword">struct</span> share_memory *)sharemem_base;<span class="hljs-comment">//填充共享内存sharemem_base</span><br>    <br><span class="hljs-comment">//	while(share_memory_begin-&gt;cmd_handled)&#123;</span><br><span class="hljs-comment">//		printk(&quot;There are orders not processed\n&quot;);</span><br><span class="hljs-comment">//		mdelay(1);</span><br><span class="hljs-comment">//	&#125;</span><br>    <br>    <span class="hljs-comment">/*将命令类型、长度、物理地址等数据写入共享内存*/</span><br>	share_memory_begin-&gt;cmd_type = cmd_type;<br>	share_memory_begin-&gt;cmd_length = cmd_length;<br>	share_memory_begin-&gt;cmd_sequence = cmd_sequence;<br>	share_memory_begin-&gt;cmd_addr_phys = cmd_addr_phys;<br>    <br>	share_memory_begin-&gt;cmd_handled = <span class="hljs-number">0</span>;<span class="hljs-comment">//将标志位置0表示已写完</span><br><br>    <br>	r = httcsec_io_send_message(&amp;cmd_addr_phys,<span class="hljs-keyword">sizeof</span>(cmd_addr_phys), <span class="hljs-number">1</span>);<span class="hljs-comment">//发送消息（通过中断）</span><br>    <br>	<span class="hljs-keyword">if</span>(r)&#123;<span class="hljs-comment">//失败解锁并返回错误</span><br>		mutex_unlock (&amp;mutex);<br>		<span class="hljs-keyword">return</span> r;<br>	&#125;<br>    <br>	<span class="hljs-keyword">for</span>(i=<span class="hljs-number">0</span>;i&lt;<span class="hljs-number">600</span>;i++)&#123; <span class="hljs-comment">//等待十分钟</span><br>        <span class="hljs-comment">//当对端把cmd_handled置1时表示已经读完，可释放锁</span><br>		<span class="hljs-keyword">if</span>(share_memory_begin-&gt;cmd_handled)&#123;<br>			mutex_unlock (&amp;mutex);<br>			<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>		&#125;<br>        <br>		schedule_timeout_uninterruptible(HZ);<span class="hljs-comment">//让当前任务主动交出 CPU 控制权，挂起（Sleep）一段时间，不会响应信号</span><br><br>		<span class="hljs-keyword">if</span>(i%<span class="hljs-number">10</span> == <span class="hljs-number">0</span>)&#123; <span class="hljs-comment">//每隔 10 秒检查一次</span><br>            <span class="hljs-comment">//如果是第一次运行（proxypid 为 0），或者之前没获取到，就去尝试获取用户态代理进程的PID</span><br>			<span class="hljs-keyword">if</span>(proxypid == <span class="hljs-number">0</span>)&#123;<br>				proxypid = get_proxy_pid();<br>			&#125;<br>            <span class="hljs-comment">/*检查这个 proxypid 对应的进程是否还在正常运行</span><br><span class="hljs-comment">            如果没有正常运行就释放锁并返回（接收消息的代理已经消失或重启，原先的任务不需要再等待了）*/</span><br>			<span class="hljs-keyword">if</span>(compare_proxy(proxypid,PROXY_RUNNING_CHECK) != <span class="hljs-number">0</span>)&#123;<br>				mutex_unlock (&amp;mutex);<br>				<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>			&#125;<br>		&#125;<br>	&#125;<br><br>	mutex_unlock (&amp;mutex);<br>	<span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>	<span class="hljs-comment">//share_memory_begin-&gt;cmd_ret = *cmd_ret;</span><br><br><br>	<span class="hljs-comment">//length = sizeof(&amp;cmd_addr_phys);</span><br>	<span class="hljs-comment">//send_netlink_back_data(pid, (void *)&amp;cmd_addr_phys, length, 1);</span><br>	<span class="hljs-comment">//return 0;</span><br>&#125;<br>EXPORT_SYMBOL_GPL(send_command);<br></code></pre></td></tr></table></figure>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/mermaid-diagram-2025-12-23-154059.png" srcset="/img/loading.gif" lazyload alt="mermaid-diagram-2025-12-23-154059"></p>
+<p>调用关系（三层）：</p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20251223172131906.png" srcset="/img/loading.gif" lazyload alt="image-20251223172131906"></p>
+<h3 id="tcs-tddl">tcs/tddl</h3>
+<h3 id="tcs-tcsapi">tcs/tcsapi</h3>
+<ul>
+<li>
+<p>tcs/tcsapi/tcsu/</p>
+</li>
+<li>
+<p>tcs/tcsapi/tcsk/</p>
+</li>
+</ul>
+<h3 id="tcs-tcm">tcs/tcm/</h3>
+<h3 id="tcs-mocktsb">tcs/mocktsb/</h3>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">- tss-main/tcs/<br>  |<span class="hljs-string"></span><br><span class="hljs-string">  +-- common/                         // 【公共定义区】内核态与用户态代码共用的基础定义</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tcs_config.h                // 全局编译配置宏（如是否开启 DEBUG，是否支持某些特定功能）。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tpcm_command.h              // TPCM 硬件指令的原始二进制结构体定义（命令头、响应头）。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<br>  |<span class="hljs-string">   +-- kernel/                     // 内核态专用的通用工具</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- kutils.h                // 内核开发辅助宏。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- memdebug.h              // 内核内存泄漏检测工具。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- version.h               // 版本号定义。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<br>  |<span class="hljs-string">   +-- user/                       // 用户态专用的通用工具</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       </span>|<span class="hljs-string">-- tutils.h                // 用户态辅助函数声明。</span><br><span class="hljs-string">  </span>|<br>  +-- include/                        // 【对外头文件区】定义了 TCS 提供的所有服务接口<br>  |<span class="hljs-string">   </span>|<span class="hljs-string">-- tpcm_def.h                  // TPCM 芯片相关的常量定义（如错误码、寄存器地址偏移）。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<br>  |<span class="hljs-string">   +-- tcsapi/                     // **核心 API 定义** (这是上层 TCF 调用的菜单)</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tcs_attest.h            // 远程证明服务：获取 Quote，验证平台身份。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tcs_auth.h              // 授权服务：管理谁有权限调用 TSB 功能。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tcs_bmeasure.h          // 启动度量服务：获取 BIOS/Bootloader 阶段的度量日志。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tcs_key.h               // 密钥服务：创建、加载、卸载密钥，数据封存(Sealing)。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tcs_license.h           // 授权 License 管理：导入/验证 License。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tcs_policy.h            // 策略管理：设置白名单策略、关键文件保护策略。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tcs_process.h           // 进程身份标识相关接口。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tcs_protect.h           // 运行时保护相关接口。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tcs_tnc.h               // 可信网络连接 (TNC) 支持接口。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tcs_constant.h          // 全局常量（如哈希算法 ID、密钥类型 ID）。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tcs_error.h             // 统一错误码定义。</span><br><span class="hljs-string">  </span>|<br>  +-- tdd/                            // 【驱动层】(Trusted Device Driver) - Linux 内核驱动<br>  |<span class="hljs-string">   </span>|<span class="hljs-string">-- tdd.c                       // 驱动入口：</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">                               // 1. module_init/exit。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">                               // 2. 注册字符设备 /dev/tcs (或类似)。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">                               // 3. 实现 file_operations (open, release, ioctl)。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tdd_tpcm.c                  // 硬件通信逻辑：</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">                               // 1. 实现与 TPCM 芯片的物理 IO (ioread/iowrite)。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">                               // 2. 处理硬件中断或轮询状态寄存器。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- comm_driver.c               // 通用通信层实现。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- netlink.c                   // Netlink 接口，用于内核向用户态发送异步通知（如告警）。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- cmd_man.c                   // 命令管理，可能用于处理并发命令队列。</span><br><span class="hljs-string">  </span>|<br>  +-- tddl/                           // 【驱动库层】(TDD Library) - 硬件抽象层<br>  |<span class="hljs-string">   </span>|<span class="hljs-string">                               // 作用：将逻辑请求打包成硬件特定的二进制包，屏蔽不同芯片差异。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tddl.h                      // TDDL 接口定义。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tpcm_tddl.c                 // 针对 TPCM 规范的指令打包实现。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tcm_tddl.c                  // 针对 TCM 规范的指令打包实现。</span><br><span class="hljs-string">  </span>|<br>  +-- tcsapi/                         // 【核心实现层】业务逻辑的具体代码<br>  |<span class="hljs-string">   </span>|<br>  |<span class="hljs-string">   +-- tcsu/                       // **用户态库 (libtcs.so)**</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tcs.c                   // 库初始化，打开驱动设备句柄。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- transmit.c              // **关键**：封装 ioctl，将打包好的命令结构体发送给内核。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tcs_attest.c            // 实现 tcs_attest.h 定义的接口（参数检查 -&gt; 打包 -&gt; transmit）。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tcs_key.c               // 实现密钥相关接口。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<span class="hljs-string">   </span>|<span class="hljs-string">-- tcs_*.c                 // 对应 include/tcsapi/ 下的每个头文件的具体实现。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">   </span>|<br>  |<span class="hljs-string">   +-- tcsk/                       // **内核模块 (tcs.ko)**</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       </span>|<span class="hljs-string">-- tcs.c                   // 模块主逻辑：</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       </span>|<span class="hljs-string">                           // 1. 接收来自 tcsu 的 ioctl 请求。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       </span>|<span class="hljs-string">                           // 2. 解析命令字 (cmd_id)。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       </span>|<span class="hljs-string">                           // 3. 分发给具体的处理函数 (dispatch)。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       </span>|<span class="hljs-string">-- tcs_auth.c              // 权限检查核心：判断当前进程/用户是否有权执行该操作。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       </span>|<span class="hljs-string">-- tcs_policy.c            // 策略引擎：在内核中维护白名单链表/红黑树。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       </span>|<span class="hljs-string">-- tcs_protect.c           // 保护逻辑实现。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       </span>|<span class="hljs-string">-- kutils.c                // 内核辅助工具。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       +-- smk/                    // 内核态国密算法实现 (SM3/SM4)，用于内核内计算哈希。</span><br><span class="hljs-string">  </span>|<br>  +-- tcm/                            // 【协议栈层】TCM 2.0 协议支持库<br>  |<span class="hljs-string">   +-- lib/                        // 包含大量 .c 文件，实现了 TCM 协议规范</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       </span>|<span class="hljs-string">-- bind.c                  // 数据绑定 (Bind) 命令封装。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       </span>|<span class="hljs-string">-- seal.c                  // 数据封装 (Seal) 命令封装。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       </span>|<span class="hljs-string">-- sign.c                  // 签名 (Sign) 命令封装。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       </span>|<span class="hljs-string">-- pcrs.c                  // PCR 读取与扩展操作。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       </span>|<span class="hljs-string">-- keys.c                  // 密钥对象构建。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       </span>|<span class="hljs-string">-- serialize.c             // 序列化工具：将 C 结构体转换为网络字节序二进制流。</span><br><span class="hljs-string">  </span>|<span class="hljs-string">       </span>|<span class="hljs-string">-- tcm_util.c              // TCM 工具函数。</span><br><span class="hljs-string">  </span>|<br>  +-- mocktsb/                        // 【仿真层】<br>      |<span class="hljs-string">-- tsb_admin.c                 // 模拟管理接口，用于在非 TPCM 环境下开发测试。</span><br><span class="hljs-string">      </span>|<span class="hljs-string">-- tsb_measure_user.c          // 模拟度量接口，返回预设的“成功”状态。</span><br></code></pre></td></tr></table></figure>
+<h2 id="对外API-tcs-tcsapi">对外API tcs/tcsapi</h2>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>TSB-agent分析</div>
+      <div>http://yzsandw.com/2025/12/23/TSB-agent分析/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>5Y2z</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年12月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/12/04/CVE-2020-14364-Qemu%E9%80%83%E9%80%B8%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" title="CVE-2020-14364-Qemu逃逸漏洞复现">
+                        <span class="hidden-mobile">CVE-2020-14364-Qemu逃逸漏洞复现</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
