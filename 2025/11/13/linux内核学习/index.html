@@ -19,16 +19,16 @@
   <meta name="author" content="5Y2z">
   <meta name="keywords" content="">
   
-    <meta name="description" content="小菜鸡的内核之旅？好吧一直都是想起来才学">
+    <meta name="description" content="小菜鸡的内核之旅？好吧一直都是想起来才学(鸭鸭梨可爱捏)">
 <meta property="og:type" content="article">
 <meta property="og:title" content="linux内核学习">
 <meta property="og:url" content="http://yzsandw.com/2025/11/13/linux%E5%86%85%E6%A0%B8%E5%AD%A6%E4%B9%A0/index.html">
 <meta property="og:site_name" content="5Y2z_blog">
-<meta property="og:description" content="小菜鸡的内核之旅？好吧一直都是想起来才学">
+<meta property="og:description" content="小菜鸡的内核之旅？好吧一直都是想起来才学(鸭鸭梨可爱捏)">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/Warframe0011.jpg">
 <meta property="article:published_time" content="2025-11-13T07:52:49.000Z">
-<meta property="article:modified_time" content="2025-12-23T11:32:34.258Z">
+<meta property="article:modified_time" content="2026-03-19T01:27:14.561Z">
 <meta property="article:author" content="5Y2z">
 <meta property="article:tag" content="kernel">
 <meta name="twitter:card" content="summary_large_image">
@@ -236,7 +236,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          562 字
+          3.1k 字
         
       </span>
     
@@ -247,7 +247,7 @@
         
         
         
-          5 分钟
+          26 分钟
         
       </span>
     
@@ -289,15 +289,16 @@
             
               <div class="markdown-body">
                 
-                <h1 id="页">页</h1>
-<h2 id="页表项（PTE）">页表项（PTE）</h2>
+                <h1 id="内存管理">内存管理</h1>
+<h2 id="页">页</h2>
+<h3 id="页表项（PTE）">页表项（PTE）</h3>
 <p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20251113165506677.png" srcset="/img/loading.gif" lazyload alt="image-20251113165506677"></p>
 <p>拆解后分两部分：</p>
-<h3 id="1-PFN（物理页号）">(1) PFN（物理页号）</h3>
+<h4 id="1-PFN（物理页号）">(1) PFN（物理页号）</h4>
 <p>就是哪个物理页，存放在 PTE 的高 52 位（细节依赖 CPU）。</p>
 <p>物理地址 = PFN &lt;&lt; 12<br>
 （因为每页 4KB）</p>
-<h3 id="2-flag-bits（权限-状态位）">(2) flag bits（权限/状态位）</h3>
+<h4 id="2-flag-bits（权限-状态位）">(2) flag bits（权限/状态位）</h4>
 <p>常见的标志位包括：</p>
 <table>
 <thead>
@@ -360,8 +361,8 @@
 PTE 中 R/W=0 → 页只读<br>
 PTE 中 NX=1 → 页不可执行<br>
 PTE 中 Present=0 → 页不在内存，引发 page fault，从 swap/load-in 再填充页表</p>
-<h2 id="反向映射-RMAP-技术">反向映射(RMAP)技术</h2>
-<h3 id="基本概念">基本概念</h3>
+<h3 id="反向映射-RMAP-技术">反向映射(RMAP)技术</h3>
+<h4 id="基本概念">基本概念</h4>
 <ul>
 <li>
 <p><strong>正向映射</strong></p>
@@ -377,6 +378,94 @@ PTE 中 Present=0 → 页不在内存，引发 page fault，从 swap/load-in 再
 </blockquote>
 <p><strong>Linux2.4没有反向映射</strong><br>
 在linux2.4内核中没有反向映射的这个概念，当时为了找到一个物理页面对应的页表项就需要遍历系统中所有的mm组成的链表，然后再遍历每一个mm的每一个vma看这个vma是否映射了这页，这个过程相当低效，最坏情况不得不遍历完所有的mm然后才能找映射到这个页的所有pte。</p>
+<h2 id="伙伴系统和slab分配器">伙伴系统和slab分配器</h2>
+<p>在现代操作系统中，内存管理是支撑系统运行的核心支柱之一。它不仅决定了资源利用的效率，还直接影响性能、稳定性和应用程序的体验。在 Linux 内核中，内存管理通过分层设计实现了高效与灵活的平衡，其中 <strong>伙伴系统（Buddy System）</strong> 是物理内存分配的基础机制。无论是用户态程序通过 <code>malloc()</code> 请求内存，还是内核态创建进程描述符、分配文件缓冲区，背后都离不开伙伴系统的支持。</p>
+<h3 id="伙伴系统">伙伴系统</h3>
+<p>Linux内核中使用伙伴系统(buddy system)来分配以页为单位的内存。</p>
+<p>首先我们来说一下使用伙伴系统的原因，也就是解释一下内存分配时的内存碎片问题。内存碎片即“碎片的内存”，它分为<strong>外碎片</strong>和<strong>内碎片</strong>，内存碎片描述一个系统中所有不可用的空闲内存，这些碎片之所以不能被使用，是因为负责动态分配内存的分配算法使得这些空闲的内存无法使用，这一问题的发生，原因在于这些空闲内存小且以不连续方式出现在不同的位置。因此这个问题的或大或小取决于内存管理算法的实现上。</p>
+<p><strong>外碎片</strong></p>
+<p>外部碎片指的是还没有被分配出去（不属于任何进程），但由于太小了无法分配给申请内存空间的新进程的内存空闲区域。</p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20251224112002335.png" srcset="/img/loading.gif" lazyload alt="image-20251224112002335"></p>
+<p><strong>内碎片</strong></p>
+<p>内部碎片就是已经被分配出去（能明确指出属于哪个进程）却不能被进程利用的内存空间。也就是分配给进程的内存空间过大，进程原本不需要这么多内存。</p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20251224112406247.png" srcset="/img/loading.gif" lazyload alt="image-20251224112406247"></p>
+<h3 id="slab分配器">slab分配器</h3>
+<h2 id="内存回收">内存回收</h2>
+<h3 id="内存回收的方式">内存回收的方式</h3>
+<p>需要注意的是，我们这里提到的内存回收指的物理内存管理的逻辑。</p>
+<p>1.直接内存回收：在编程语言或操作系统级别手动回收不再使用的内存资源。在编程语言中，就像用户程序通过free函数释放曾经通过malloc函数分配的内存一样。在操作系统层面，直接内存回收通常由垃圾回收器（Garbage Collector）来完成。垃圾回收器会自动检测并回收不再使用的对象所占用的内存空间，以减少内存泄漏和资源浪费。</p>
+<p>2.定期扫描回收（kswapd）：定期扫描回收（kswapd）是Linux内核中的一个守护进程，用于管理系统内存和交换空间。它负责检查当前内存使用情况，并在需要时进行页面回收或交换页面到磁盘上的交换分区。</p>
+<p>3.OOM机制（out of memory）：OOM机制是在内存不足时，内核使用了kswapd回收内存后仍然不够分配内存，就会触发OOM机制强制杀死占用内存最多的程序</p>
+<h3 id="定期扫描回收（kswapd）">定期扫描回收（kswapd）</h3>
+<p>kswapd 是一个内核线程，在内存不足时负责在后台进行内存回收，这个过程发生在后台，因此是异步发生，不会阻塞进程。</p>
+<p>内核对内存的容量设置了三个阈值：</p>
+<ul>
+<li>页最小阈值（pages_min）</li>
+<li>页低阈值（pages_low）</li>
+<li>页高阈值（pages_high）</li>
+</ul>
+<p>当内存大于 <strong>pages_low</strong> 时，表示此时系统内存足够，不会进行内存回收。</p>
+<p>当内存小于 <strong>pages_low</strong> 时，表示此时内存存在压力，会触发 kswapd0 进行后台内存回收，<strong>直到 pages_high 为止</strong>。</p>
+<p>当内存小于 <strong>pages_min</strong> 时，表示此时用户内存耗尽，会触发直接内存回收，进程被阻塞。</p>
+<h1 id="CPU调度">CPU调度</h1>
+<h2 id="CPU的上下文切换">CPU的上下文切换</h2>
+<p><strong>上下文切换的概念</strong>：如今的OS几乎都支持&quot;同时&quot;运行远大于CPU数量的任务，OS会将CPU轮流分配给它们使用。这就要求OS必须知道从哪里加载任务，以及加载后从哪里开始运行，而这些信息都保存在CPU的<strong>寄存器</strong>中，其中即将执行的下一条指令的地址被保存在<strong>程序计数器</strong>（PC）这一特殊寄存器上。<strong>我们将寄存器的这些信息称为CPU的上下文，也叫硬件上下文</strong>。</p>
+<p>OS在切换运行任务时，<strong>将上一任务的上下文保存下来，并将即将运行的任务的上下文加载到CPU寄存器上的这一动作，被称为CPU上下文切换</strong>。</p>
+<blockquote>
+<p>CPU上下文属于进程上下文的一部分，我们常说的进程上下文由如下两部分组成：</p>
+<ul>
+<li><strong>用户级上下文</strong>：包含进程的运行时堆栈、数据块、代码块等信息。</li>
+<li><strong>系统级上下文</strong>：包含进程标识信息、进程现场信息（CPU上下文）、进程控制信息等信息。</li>
+</ul>
+</blockquote>
+<p><strong>那具体的上下文切换过程是怎么样的呢？上下文信息保存在哪？</strong></p>
+<p>操作系统为每个进程分配虚拟内存时，会预留一部分仅内核可见的地址空间。当调度发生时，内核会将当前 CPU 的通用寄存器、程序计数器等现场信息写入该进程内核空间的特定数据结构中（如进程控制块 PCB 关联的内核栈）。</p>
+<p><strong>上下文切换的触发机制</strong></p>
+<ul>
+<li>协作式策略：用户程序通过执行系统调用或产生运算异常（如除零）将 CPU 控制权交还给内核。</li>
+<li>抢占式策略：操作系统在初始化时向硬件注册中断处理回调，每隔固定时间周期，硬件产生的时钟中断会强制夺回 CPU 处理权并跳转至内核代码。</li>
+</ul>
+<p>CPU调度：操作系统从就绪队列中挑选一个进程或者线程作为CPU将要运行的下一个进程或者线程。调度的程序是进程或者线程的内核函数（通过一些调度策略实现）</p>
+<p>进行调度的时机：即操作系统什么时候执行进程或者线程的内核函数（调度程度），内核运行调度程序的的条件为一个进程从运行状态切换到等待状态或者当前进程被终结</p>
+<h2 id="抢占式和非抢占式调度策略">抢占式和非抢占式调度策略</h2>
+<p><strong>抢占式</strong>：内核可以在进程运行过程中，根据优先级或时间片等策略强制中断当前进程的执行，并将其拥有的 CPU 资源分配给另一个进程的机制。</p>
+<p><strong>非抢占式</strong>：一旦进程获得处理机便一直运行直至执行完毕或主动阻塞，操作系统内核在此期间不会强制剥夺其 CPU 控制权的调度方式。</p>
+<blockquote>
+<p>注意这里的抢占式和非抢占式同前文的协作式和抢占式不同。此处指的是操作系统的<strong>调度策略</strong>，前文指的是上下文切换的<strong>触发机制</strong>，但是从逻辑上来说总体逻辑非常相似</p>
+</blockquote>
+<h2 id="调度算法评判标准">调度算法评判标准</h2>
+<p><strong>CPU使用率</strong>：指的是CPU处于忙状态的时间百分比</p>
+<p><strong>吞吐量</strong>：单位时间内完成的进程数量</p>
+<p><strong>周转时间</strong>：指从任务到达至任务完成之间的时间，计算方式为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mrow><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi><mi>a</mi><mi>r</mi><mi>o</mi><mi>u</mi><mi>n</mi><mi>d</mi></mrow></msub><mo>=</mo><msub><mi>T</mi><mrow><mi>c</mi><mi>o</mi><mi>m</mi><mi>p</mi><mi>l</mi><mi>e</mi><mi>t</mi><mi>i</mi><mi>n</mi><mi>g</mi></mrow></msub><mo>−</mo><msub><mi>T</mi><mrow><mi>a</mi><mi>r</mi><mi>r</mi><mi>i</mi><mi>v</mi><mi>a</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">T_{turnaround}=T_{completing}-T_{arrival}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">na</span><span class="mord mathnormal mtight">ro</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight">n</span><span class="mord mathnormal mtight">d</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">co</span><span class="mord mathnormal mtight">m</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">pl</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">in</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">g</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">rr</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></p>
+<p><strong>等待时间</strong>：进程在就绪队列中等待的总时间</p>
+<p><strong>响应时间</strong>：指从任务到达至任务首次被调度的时间</p>
+<p><strong>算法目标</strong>：</p>
+<p>响应时间目标：响应时间是操作系统计算延迟的指标，一个好的调度策略应该做到以下两点</p>
+<ul>
+<li>减少响应时间，即使处理用户的输入请求，尽快将输出反馈给用户</li>
+<li>减少平均响应时间的波动</li>
+</ul>
+<p>吞吐量目标：吞吐量是操作系统计算带宽的重要指标，一个好的调度策略应该做到以下两点</p>
+<ul>
+<li>增加吞吐量，减少开销（操作系统进行上下文切换的开销），保证系统的资源得到高效利用（CPU、I/O设备）</li>
+<li>减少每个进程的等待时间</li>
+</ul>
+<p>公平性目标：保证每个进程占用相同的CPU时间，保证每个进程的等待时间相同（即每一个进程都有可能得到操作系统的服务）</p>
+<h2 id="批处理调度">批处理调度</h2>
+<h3 id="FCFS-First-Come，First-Served-：先来先服务">FCFS(First Come，First Served)：先来先服务</h3>
+<p>依据进程进入就绪状态队列的先后顺序排序，运行态进程进入等待或结束状态时，就绪队列中的下一个进程就会占用CPU执行，下面举一个先来先服务的示例，三个进程的处理时间分别为12，3，3，分两种进程到达顺序讨论（它们在接近同一时刻到达，但是也有先后顺序）</p>
+<p>先来先服务是cpu调度算法最简单的实现方式，但是其缺点是，当一个长任务先到达时，后续的好几个短任务都必须要先等待长任务处理完之后再处理，平均等待时间过长，I/O资源和CPU资源利用率较低，CPU密集型会导致I/O设备闲置，I/O密集型会导致CPU闲置。</p>
+<h3 id="SJF-Shortest-Job-First-：-短作业优先算法">SJF(Shortest Job First)： 短作业优先算法</h3>
+<p>选择就绪队列中执行时间最短的进程占用CPU进行入运行状态，就绪队列按照预期的执行时间来排序（准确的进程运行时间在未执行结束前是不知道的，只能通过预判断来获取大致运行时间，然后排序）</p>
+<h3 id="HRRN-Highest-Response-Ratio-Next-：最高响应比优先算法">HRRN(Highest Response Ratio Next)：最高响应比优先算法</h3>
+<h3 id="RR-：时间片轮转算法">RR()：时间片轮转算法</h3>
+<h3 id="MLFQ-Multilevel-Feedback-Queues-：多级反馈队列算法">MLFQ(Multilevel Feedback Queues)：多级反馈队列算法</h3>
+<h2 id="实时调度">实时调度</h2>
+<h2 id="多处理器调度">多处理器调度</h2>
+<h2 id="优先级反转现象">优先级反转现象</h2>
+<h1 id="操作系统I-O基础">操作系统I/O基础</h1>
+<h1 id="Reference">Reference</h1>
+<p><a target="_blank" rel="noopener" href="https://www.nowcoder.com/discuss/544284985797169152">『面试问答』：什么是内存碎片？如何减少内存碎片？_牛客网</a></p>
 
                 
               </div>

@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/fe48cc7f9c7faaf513b78a0bb6c239e.jpg">
 <meta property="article:published_time" content="2025-07-09T03:06:04.000Z">
-<meta property="article:modified_time" content="2025-12-04T03:28:17.894Z">
+<meta property="article:modified_time" content="2026-03-05T02:04:27.696Z">
 <meta property="article:author" content="5Y2z">
 <meta property="article:tag" content="PCIe">
 <meta name="twitter:card" content="summary_large_image">
@@ -236,7 +236,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          6k 字
+          7.6k 字
         
       </span>
     
@@ -247,7 +247,7 @@
         
         
         
-          50 分钟
+          64 分钟
         
       </span>
     
@@ -338,13 +338,13 @@
 <p>每个PCI 设备都有着三个编号：<strong>总线编号（Bus Number）、设备编号（Device Number）与功能编号（Function Number）</strong>，作为设备的唯一标识；在此之上还有 <strong>PCI 域</strong>的概念，一个 PCI 域上最多可以连接 256 根 PCI 总线</p>
 <p>当我们使用 <code>lspci</code> 命令查看 PCI 设备信息时，在每个设备开头都可以看到形如 <code>xx:yy.z</code> 的十六进制编号，这个格式其实是 <code>总线编号:设备编号.功能编号</code>，当我们使用 <code>lspci -v </code>查看 PCI 设备信息时，在总线编号前面的 4 位数字便是 PCI 域的编号</p>
 <h1 id="PCI设备配置空间">PCI设备配置空间</h1>
-<p>PCIE配置空间‌是每个PCIe设备的一段独立空间，系统通过访问这段空间可以获取设备的信息并进行配置。配置空间的结构包括<strong>头标区</strong>和<strong>设备相关区</strong>，<strong>配置头长度为64字节，包含用于唯一识别设备的字段</strong>；剩余的字节则因设备而异，用于描述设备的特定功能‌。</p>
-<p><strong>PCI设备配置空间为256字节，PCIE设备的配置空间为4K字节，两种设备配置头均为64字节</strong>，但由于PCIE设备的功能更强大，需要更多扩展空间来描述其特定功能‌，又为了兼容PCI，PCIE扩展了地址0x100~0xfff用于PCIE扩展配置空间。</p>
-<p>在每次启动时，PCIe设备的配置空间地址一般有BOIS分配，分配完成后主设备系统启动后可扫描PCIe设备的配置空间，获取PCIe设备并完成PCIE相关配置。</p>
-<p>PCI及PCIE配置空间分配如下图所示</p>
+<p>PCIe配置空间‌是每个PCIe设备的一段独立空间，系统通过访问这段空间可以获取设备的信息并进行配置。配置空间的结构包括<strong>头标区</strong>和<strong>设备相关区</strong>，<strong>配置头长度为64字节，包含用于唯一识别设备的字段</strong>；剩余的字节则因设备而异，用于描述设备的特定功能‌。</p>
+<p><strong>PCI设备配置空间为256字节，PCIe设备的配置空间为4K字节，两种设备配置头均为64字节</strong>，但由于PCIe设备的功能更强大，需要更多扩展空间来描述其特定功能‌，又为了兼容PCI，PCIe扩展了地址0x100~0xfff用于PCIe扩展配置空间。</p>
+<p>在每次启动时，PCIe设备的配置空间地址一般有BOIS分配，分配完成后主设备系统启动后可扫描PCIe设备的配置空间，获取PCIe设备并完成PCIe相关配置。</p>
+<p>PCI及PCIe配置空间分配如下图所示</p>
 <p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20250710203458864.png" srcset="/img/loading.gif" lazyload alt="image-20250710203458864"></p>
-<h2 id="PCIE配置头">PCIE配置头</h2>
-<p>PCIE 64字节的配置头分为两种，Type0和Type1，Type0用于描述PCIE Endpoint，Type1用于描述PCIE Bridge或者Switch。</p>
+<h2 id="PCIe配置头">PCIe配置头</h2>
+<p>PCIe 64字节的配置头分为两种，Type0和Type1，Type0用于描述PCIe Endpoint，Type1用于描述PCIe Bridge或者Switch。</p>
 <p>Agent 类型配置空间又被称为 <code>Type 00h</code>，格式如下图所示：</p>
 <p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20250710202242452.png" srcset="/img/loading.gif" lazyload alt="image-20250710202242452"></p>
 <p>Bridge 类型配置空间被称为 <code>Type 01h</code>，与 Agent 类型配置空间大同小异：</p>
@@ -430,7 +430,7 @@
 <p>例如：</p>
 <p>CPU或DMA控制器发出PCI设备的物理地址（如<code>0x50000008</code>，地址<code>0x50000000</code>+偏移<code>0x08</code>）,HOST 主桥会将其转换为 PCI 总线域地址（如 <code>0xE000_0008</code>），再通过 PCI 总线发送给设备。同样，当设备执行 DMA 写入内存时，它使用 PCI 总线域地址（如 <code>0xE000_0000</code>），HOST 主桥会将其转换为存储器域地址（如 <code>0x5000_0000</code>），最终由内存控制器完成写入。</p>
 </blockquote>
-<p>如前面描述，PCIE配置空间中不同type下的BAR配置空间不同，Type0有6个可配置BAR空间，Type1有2个可配置BAR空间。</p>
+<p>如前面描述，PCIe配置空间中不同type下的BAR配置空间不同，Type0有6个可配置BAR空间，Type1有2个可配置BAR空间。</p>
 <h1 id="PCI-设备内存-端口空间与访问方式">PCI 设备内存 &amp; 端口空间与访问方式</h1>
 <p>前面我们讲了 PCI 设备与特性和配置相关的配置空间，现在我们来看与 PCI 设备与实际操作相关的内存映射空间与端口映射空间。</p>
 <p>所有 IO 设备的内存与端口空间需要被映射到对应的地址空间/端口空间中才能访问，这需要占用部分的内存地址空间与端口地址空间，上一章已经提到过两种映射外设资源的方式<strong>MMIO</strong>和<strong>PMIO</strong>。</p>
@@ -439,17 +439,17 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs shell">root@compute01:~# cat /proc/iomem<br>00000000-00000fff : Reserved<br>00001000-000977ff : System RAM<br>00097800-0009ffff : Reserved<br>000a0000-000bffff : PCI Bus 0000:00<br>000c0000-000dffff : PCI Bus 0000:00<br>000e0000-000fffff : Reserved<br>  000f0000-000fffff : System ROM<br>00100000-7a3dffff : System RAM<br>7a3e0000-7a6bdfff : Reserved<br>7a6be000-7a7bdfff : ACPI Non-volatile Storage<br>7a7be000-7a7fdfff : ACPI Tables<br>7a7fe000-7bffdfff : System RAM<br>7bffe000-7fffffff : Reserved<br>bcc00000-bf1fffff : PCI Bus 0000:e0<br>  bcc00000-bcdfffff : PCI Bus 0000:e2<br>    bcc00000-bccfffff : 0000:e2:00.1<br>    bcd00000-bcd01fff : 0000:e2:00.1<br></code></pre></td></tr></table></figure>
 <p>通过 procfs 的 <code>/proc/ioports</code> 我们可以查看 IO 端口情况，其中便包括各种设备对应的 PMIO 端口：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs shell">root@compute01:~# cat /proc/ioports<br>0000-02f7 : PCI Bus 0000:00<br>  0000-001f : dma1<br>  0020-0021 : pic1<br>  0040-0043 : timer0<br>  0050-0053 : timer1<br>  0060-0060 : keyboard<br>  0061-0061 : PNP0800:00<br>  0064-0064 : keyboard<br>  0070-0071 : rtc0<br>  0080-008f : dma page reg<br>  00a0-00a1 : pic2<br>  00c0-00df : dma2<br>  00f0-00ff : fpu<br>0300-03af : PCI Bus 0000:00<br>03b0-03df : PCI Bus 0000:00<br>  03c0-03df : vesafb<br>03f8-03ff : serial<br>0400-0cf7 : PCI Bus 0000:00<br>  040b-040b : pnp 00:02<br>  04d0-04d1 : pnp 00:02<br>  04d6-04d6 : pnp 00:02<br>  0800-089f : pnp 00:02<br>    0800-0803 : ACPI PM1a_EVT_BLK<br>    0804-0805 : ACPI PM1a_CNT_BLK<br>    0808-080b : ACPI PM_TMR<br>    0820-0827 : ACPI GPE0_BLK<br>  0900-090f : pnp 00:02<br>  0910-091f : pnp 00:02<br>  0b00-0b0f : pnp 00:02<br>    0b00-0b08 : piix4_smbus<br></code></pre></td></tr></table></figure>
-<h1 id="总结PCIE设备识别流程">总结PCIE设备识别流程</h1>
+<h1 id="总结PCIe设备识别流程">总结PCIe设备识别流程</h1>
 <h2 id="第一阶段：PCIe-设备接入与总线发现">第一阶段：PCIe 设备接入与总线发现</h2>
 <p>当一块 PCIe 设备被插入主板时：</p>
 <ol>
-<li>PCIe Root Complex（RC）通过 LTSSM（Link Training and Status State Machine）与设备端口建立物理链路；</li>
+<li>PCIe Root Complex（RC）通过 LTSSM（Link Training and Status State Machine，链路训练状态机）检测链路上是否有设备连接；</li>
 <li>设备进入 L0 状态，表示链路准备就绪；</li>
 <li>这时设备尚未有地址，也不在主机内存映射范围内，仅在 RC 侧可探测；</li>
 </ol>
 <p>这一步 <strong>是自动发生的</strong>，不依赖 CPU 或操作系统参与，完全是硬件层完成的。</p>
 <blockquote>
-<p>RC 通常是主板芯片组的一部分（比如 Intel 的 PCH），或者直接集成在 CPU 里，它暴露出多个 <strong>PCIe Root Port</strong>，每个 Root Port 可以连接一个 PCIe 设备或 switch。负责<strong>设备枚举、地址分配、配置、事务处理</strong>。是连接 CPU/内存子系统与 PCIe 设备的&quot;网关&quot;。</p>
+<p>RC 通常是主板芯片组的一部分（比如 Intel 的 PCH），或者直接集成在 CPU 里，它暴露出多个 <strong>PCIe Root Port</strong>，每个 Root Port 可以连接一个 PCIe 设备或 switch。负责<strong>设备枚举、地址分配、配置、事务处理</strong>。</p>
 </blockquote>
 <blockquote>
 <p>当你插上一个 PCIe 设备后，<strong>主机与设备之间的物理链路还未建立</strong>，它们之间要经过一系列握手、训练、信号同步过程才能通信。这个过程就是由 <strong>LTSSM</strong> 控制的，类似于网络连接建立中的“三次握手”。LTSSM还可以实时维持信号完整性并在纳秒级内恢复链路错误。</p>
@@ -459,10 +459,10 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">TLP: CFG Read Type 0 → BDF = 00:00.0, Offset = 0x00 (Vendor ID)<br></code></pre></td></tr></table></figure>
 <blockquote>
 <p>疑惑：主机不知道PCIe的地址其实就无法访问PCIe设备，为什么还能通过BDF枚举来访问到设备？</p>
-<p>这里其实是CPU向<code>CONFIG_ADDRESS</code>写入一个格式化的值（包含B, D, F, Register Number）后，再对<code>CONFIG_DATA</code>执行I/O读/写操作时，RC硬件会<strong>自动</strong>将这个操作转换成一个 <strong>配置事务TLP (Configuration Read/Write TLP)</strong>，而RC能通过PCIe总线发送TLP，从而能找到设备。</p>
+<p>这里其实是CPU向<code>CONFIG_ADDRESS</code>写入一个格式化的值（包含B, D, F, Register Number）后，再对<code>CONFIG_DATA</code>执行I/O读/写操作时，RC硬件会<strong>自动</strong>将这个操作转换成一个 <strong>配置事务TLP (Configuration Read/Write TLP)</strong>，而RC能通过PCIe总线发送TLP，从而能找到设备。此TLP为配置事务TLP，直接将BDF当作此时的地址，这时每个桥或Switch都会根据此BDF来递送消息。</p>
 </blockquote>
 <h2 id="第三阶段：资源分配">第三阶段：资源分配</h2>
-<p>枚举到设备后，RC 读取其配置空间中的 BAR 寄存器（位于 offset 0x10 开始），主机会尝试向该 BAR 写入全 1（0xFFFFFFFF），设备按协议屏蔽掉其低位（如低 4 位），返回其所需地址大小掩码，主机用该返回值计算出所需资源大小。</p>
+<p>枚举到设备后，RC 读取PCIe设备的配置空间中的 BAR 寄存器（位于 offset 0x10 开始），主机会尝试向 BAR 写入全 1（0xFFFFFFFF），设备按协议屏蔽掉其低位（如低 4 位），返回其所需地址大小掩码，主机用该返回值计算出所需资源大小。</p>
 <p>主机为此设备 <strong>分配未被占用的内存空间</strong>，并维护一个全局的 <strong>地址空间映射表</strong>。随后主机将分配好的地址重新写入 BAR，告诉设备：“你应该监听这个物理地址范围的访问。”</p>
 <p>主机为设备分配中断，主机通过设备的MSI/MSI-X Capability结构，分配一个或多个<strong>中断向量号</strong>（代表特定的中断处理程序）。主机将<strong>目标地址</strong>（通常是中断控制器特定的地址）和<strong>数据值</strong>（包含向量号等信息）写入设备的MSI/MSI-X配置寄存器。</p>
 <p><strong>当设备需要中断时，它不再拉信号线，而是向配置好的目标地址写入配置好的数据值（发起一个Memory Write TLP）。</strong> 中断控制器捕获这个写操作，根据数据值识别出中断向量，从而触发CPU执行相应的中断服务程序。这种方式相当于直接写内存的方式来触发中断，消除了中断线共享冲突的问题。</p>
@@ -472,14 +472,17 @@
 <h2 id="第五阶段：正常通信">第五阶段：正常通信</h2>
 <p>主机CPU/其他设备可以通过 <strong>Memory Write TLP</strong> 向设备的内存映射寄存器（由BAR定义）写入控制命令或数据，通过 <strong>Memory Read TLP</strong> 读取设备的内存映射寄存器或数据缓冲区。</p>
 <p>设备可以通过 <strong>Memory Write TLP</strong> 向主机内存写入数据（例如，网卡收到数据包DMA到内存，显卡完成渲染帧DMA到帧缓冲区），通过 <strong>Memory Read TLP</strong> 读取主机内存。</p>
-<h1 id="主机上电启动简易流程">主机上电启动简易流程</h1>
-<h2 id="x86">x86</h2>
-<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs autohotkey">`上电` → `CPU启动（固化BootROM）` → `BIOS/UEFI` → `Bootloader（如GRUB）` → `OS Kernel` → `Init`<br></code></pre></td></tr></table></figure>
-<h1 id="SoC（ARM等）">SoC（ARM等）</h1>
-<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs autohotkey">`上电` → `BootROM` → `BL1/BL2`（Bootloader 分级）→ `UEFI / TrustZone` → `OS Kernel`<br></code></pre></td></tr></table></figure>
-<h1 id="PCI中断机制🕊️">PCI中断机制🕊️</h1>
+<h1 id="PCIe中的数据传输方式">PCIe中的数据传输方式</h1>
+<h2 id="MMIO">MMIO</h2>
+<p>MMIO的传输方式是需要CPU主动发起的，PCIe 设备是<strong>完全被动</strong>的。</p>
+<p>当 CPU 指令读取设备的BAR寄存器时（前面已经说过对BAR寄存器的操作就相当于直接对设备的操作），会生成一个<strong>内存读取请求事务层数据包 (MemRd TLP)，<strong>该数据包会从主机的RC向下传输到设备。PCIe设备内部都有一个专门的硬件电路，叫地址译码器。它本质上是一个</strong>高速比较器</strong>。PCIe设备的地址译码器会与TLP中蕴含的目的地址做对比，如果地址匹配，硬件电路会立即产生一个<strong>使能信号</strong>，触发设备内部的逻辑执行操作。</p>
+<p>与此同时，在 TLP 传输期间，CPU 必须等待内存请求完成，并且不能中断或执行太多有用的工作。如您所见，如果需要执行大量此类请求，CPU 将需要花费大量时间等待设备响应每个请求。</p>
+<h2 id="DMA">DMA</h2>
+<p>MA 是迄今为止最快的 PCIe 批量传输方法，因为它的传输开销最小。DMA 是异步的，它不利用 CPU 来执行传输。相反，顾名思义，读取和写入的内存直接来自系统 RAM。一旦 DMA 开始，唯一涉及的各方是系统主内存的内存控制器和设备本身。因此，CPU 不会花费周期等待单个内存访问。相反，它只是启动转移，并让平台在后台自行完成 DMA。然后，平台将在传输完成时通知 CPU，通常是通过中断。</p>
+<p>此过程的第一步是从 OS 分配 DMA 内存。这意味着设备驱动程序必须进行 OS API 调用，以请求 OS 为设备分配一个内存区域以将数据写入。</p>
+<h2 id="PCI中断机制🕊️">PCI中断机制🕊️</h2>
 <p>PCI 设备有两种打中断的方法：传统的 INTx 中断与 MSI 中断，出于兼容的需要 PCIe 完全继承了这个特性</p>
-<h2 id="INTx中断">INTx中断</h2>
+<h3 id="INTx中断">INTx中断</h3>
 <p>INTx 类型的中断即传统的<strong>通过中断引脚来产生的中断</strong>，PCI 总线使用 <code>INTA#</code> 、<code>INTB#</code> 、<code>INTC#</code> 、<code>INTD#</code> 信号（低电平有效）向处理器发出中断请求，不过多数设备仅使用 <code>INTA#</code> 信号</p>
 <p>下图为一个产生 <code>INTA#</code> 中断信号的流程：</p>
 <ul>
@@ -495,13 +498,12 @@
 <li><code>Interrupt Line</code>：记录设备连接的引脚</li>
 </ul>
 <p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20250729152254895.png" srcset="/img/loading.gif" lazyload alt="image-20250729152254895"></p>
-<h2 id="MSI-MSI-X-中断">MSI/MSI-X 中断</h2>
-<p><strong>Message Signaled Interrupt</strong> 是一种更为现代化与普遍的 PCI 中断机制，<strong>MSI-eXtend</strong> 则为其升级版，该机制的引入是为了消除 INTx 的边带信号，目前绝大多数 PCIe 设备已不再使用传统的 INTx 中断，而是使用 MSI/MSI-X 提交中断请求</p>
-<p>在 PCIe 设备中有着两个 Capability 结构，分别对应 MSI 与 MSI-X，通常一个 PCIe 设备仅会包含其中一个。对于 MSI 而言其 Capability ID 为 5，一共有四种结构，分别对应 32 位与 64 位的 Message 结构，以及对应的带上中断 Masking 的结构</p>
-<p>MSI/MSI-X 本质上是通过<strong>向特定的内存区域进行写入</strong>来达到中断触发的效果，当 PCI 设备提交请求时，其向 <code>MSI/MSI-x Capability</code> 结构中的 <code>Message Address</code> 地址（PCI总线域）写入 <code>Message Data</code> 数据，从而产生一个存储器写 TLP，由此向处理器提交存储器写请求</p>
-<p>MSI 仅支持 32 个连续的中断向量，而 MSI-X 支持 2048 个非连续的中断向量，但 MSI-X 的中断向量信息并不像 MSI 那样直接存放在配置空间，而是存放在 MMIO 空间中，通过BIR（Base address Indicator Register）与 BAR 来确定其在 MMIO 中的具体位置</p>
-<p>其结构如下图所示：</p>
-<h1 id="PCIE协议的分层结构​​">PCIE协议的分层结构​​</h1>
+<h3 id="MSI-MSI-X-中断">MSI/MSI-X 中断</h3>
+<p><strong>Message Signaled Interrupt</strong> 是一种更为现代化与普遍的 PCI 中断机制，<strong>MSI-eXtend</strong> 则为其升级版，该机制的引入是为了消除 INTx 的边带信号，目前绝大多数 PCIe 设备已不再使用传统的 INTx 中断，而是使用 MSI/MSI-X 提交中断请求。</p>
+<p>MSI/MSI-X 本质上是通过<strong>向特定的内存区域进行写入</strong>来达到中断触发的效果，当 PCI 设备使用DMA方式提交请求时，其向 <code>MSI/MSI-x Capability</code> 结构中的 <code>Message Address</code> 地址（PCI总线域）写入 <code>Message Data</code> 数据，从而产生一个存储器写 TLP，由此向处理器提交存储器写请求。</p>
+<p>当 Root Complex 收到这个特定的写入信号时，它不会去写内存，而是向 CPU 发送一个<strong>中断信号</strong>。CPU 将跳转到驱动程序的中断处理函数，去内存里读取那里的数据。</p>
+<p>它们都通过发送消息来触发中断，而不再使用物理引脚。但 MSI 和 MSI-X 之间存在一些关键区别，主要体现在中断向量的数量和灵活性 上。MSI 仅支持 32 个连续的中断向量，而 MSI-X 支持 2048 个非连续的中断向量，但 MSI-X 的中断向量信息并不像 MSI 那样直接存放在配置空间，而是存放在 MMIO 空间中，通过BIR（Base address Indicator Register）与 BAR 来确定其在 MMIO 中的具体位置</p>
+<h1 id="PCIe协议的分层结构​​">PCIe协议的分层结构​​</h1>
 <p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20250710201210154.png" srcset="/img/loading.gif" lazyload alt="image-20250710201210154"></p>
 <p>PCIe 设备内部层次包括：</p>
 <ul>
@@ -509,6 +511,28 @@
 <li><strong>事务层</strong>。事务层负责在发送端产生 TLP（Transaction Layer Packet，事务层包），在接收端对 TLP 进行译码，用户对数据进行组帧和解析是在本层进行。这一层也负责 QoS（Quality of Service，服务质量）、流量控制以及事务排序。</li>
 <li><strong>数据链路层</strong>。数据链路层负责在发送端产生 DLLP（Data Link Layer Packet，数据链路层包），在接收端对 DLLP 进行译码。这一层也负责链路错误检测以及修正，这个数据链路层功能被称为 Ack/Nak 协议。这两个数据链路层功能会在本书的第三部分进行讲解。</li>
 <li><strong>物理层</strong>。物理层负责在发送端产生字符序列包，在接收端对字符序列包进行译码。这一层将处理上述三种类型的包（TLP、DLLP、字符序列包）在物理链路上的发送与接收。数据包在发送端要经过字节条带化逻辑、扰码器、8b/10b 编码器（对于 Gen1/Gen2）或是 128b/130b 编码器（对于 Gen3）以及数据包并串转换模块的处理。最终数据包以训练后的链路速率在所有通道上按照时钟以差分形式输出。在物理层的接收端，数据包处理包括串行地接收差分形式的比特信号，将其转换为数字信号形式，然后将输入比特流做串并转换。这个操作基于来源于 CDR（Clock and Data Recovery，时钟数据恢复）电路所提供的恢复时钟。接收下来的数据包要经过弹性缓存、8b/10b 解码器（对于 Gen1/Gen2）或者 128b/130b 解码器（对于 Gen3）、解扰器以及字节交换恢复逻辑。最终，物理层的 LTSSM（Link Training and Status State Machine，链路训练状态机）负责进行链路初始化以及训练。</li>
+</ul>
+<p>协议 共定义了3类数据包。与处理层相关的是<strong>处理层数据包（TLP）</strong>，与数据链路层相关的是<strong>数据链路层数据包（DLLP）</strong>，与物理层相关的是<strong>物理层数据包（PLP）</strong>。TLP包和DLLP包的大小如下图所以，DW代表一个双字（32bit）,B代表一个Byte。</p>
+<h2 id="TLP格式">TLP格式</h2>
+<p>TLP由前缀（TLP Prefixes，可选）、头（Header）、数据（Data ，若有）和尾（TLP Digest，可选）组成，具体如下图所示。TLP前缀由PCIe V2.1总线规范引入，分为Local TLP Prefix和EP-EP TLP Prefix两类。用来实现PASID(Process Address Space ID) 、MR-IOV（Multi Root I/O Virtualization）、Peer-Peer及其他verndor自定义的功能。TLP头定义了事务类型、路由信息、数据长度和完成状态等信息，非常重要。TLP尾是可选的End‐to‐End CRC，用来校验整个TLP报文。</p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20260302162232155.png" srcset="/img/loading.gif" lazyload alt="image-20260302162232155"></p>
+<h2 id="TLP头格式">TLP头格式</h2>
+<p>TLP头会定义事务类型、路由信息、数据长度和完成状态等信息。在最开始的设备枚举BDF时，传递的就是配置事务，而之后如果通过MMIO和DMA进行内存写入读取，使用的就是内存事务。</p>
+<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20260302164602767.png" srcset="/img/loading.gif" lazyload alt="image-20260302164602767"></p>
+<h1 id="PSP的PCIe设计">PSP的PCIe设计</h1>
+<p>我们来回看psp中的设计，有这么一段话：</p>
+<figure class="highlight tp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs tp">PSP对于 X86core来说是一个 PCI-E设备，PSP通过内部的 mailbox与 <span class="hljs-keyword">X</span><span class="hljs-number">86</span> core完成通信。mailbox由命令响应寄存器和命令缓冲区地址寄存器两个主要寄存器组成。当 <span class="hljs-keyword">X</span><span class="hljs-number">86</span>向 PSP发送一个命令时（其中包括命令和相关数据），它首先将数据放入物理连续的存储器中，并将存储器的地址写入命令缓冲地址寄存器，然后将命令 ID和控制位写入命令响应寄存器，触发对 PSP的中断及 PSP端对应的中断处理程序，直到客户注册的命令处理程序被调用。当 PSP处理完命令后，它会以中断的形式将包含结果的响应发送回 <span class="hljs-keyword">X</span><span class="hljs-number">86</span>，<span class="hljs-keyword">X</span><span class="hljs-number">86</span>侧通过中断收到结果。以下为各阶段 mailbox配置过程：<br><span class="hljs-number">1</span>、在 PSP启动阶段，PSP配置mailbox被外部（比如<span class="hljs-keyword">X</span><span class="hljs-number">86</span> core）访问的读写权限（仅 PSP可配置，<span class="hljs-keyword">X</span><span class="hljs-number">86</span>无权配置该权限）。默认 <span class="hljs-keyword">X</span><span class="hljs-number">86</span>无读写权限。<br><span class="hljs-number">2</span>、在<span class="hljs-keyword">X</span><span class="hljs-number">86</span>的BIOS 启动阶段，将 mailbox 地址信息配置进PCI-E 总线上的PSP设备的 BAR配置中（配置完就会被锁定）。<br><span class="hljs-number">3</span>、在 <span class="hljs-keyword">X</span><span class="hljs-number">86</span> 的 OS内核启动时，通过枚举 PCI-E设备，获取 BAR信息（包含mailbox 寄存器地址的 BAR 信息）并传递给内核 CCP 驱动，实现 CCP 驱动通过 mailbox与 PSP设备通信。<br></code></pre></td></tr></table></figure>
+<p>不难注意到，这段话的一个关键点在于mailbox配置的过程，这个过程中，第一步没有什么好说的，配置读写权限这一块是通过总线控制的。</p>
+<p>而第二句话可以看出，在系统探测阶段，PSP的Mailbox是可以看作一个正常的PCIe设备启动过程进行配置的，并且BIOS分配一个地址给Mailbox并将该地址写入到BAR寄存器中。</p>
+<p>第三步中，OS枚举每一个PCIe设备并获取其中BAR寄存器的值，也就是获取BIOS给PSP分配的地址，随后传递给CCP驱动。</p>
+<p>而前面的通信过程很像</p>
+<ul>
+<li>首先，x86 侧的驱动在主机 RAM 里开辟一段缓冲区，把要处理的明文数据放进去，本质上就是一次普通的内存读写。</li>
+<li>随后驱动通过 MMIO 向 PSP 对应的 BAR 寄存器写入这段缓冲区的物理地址，这一步在总线上体现为一次 MemWr 配置到设备寄存器的写事务。</li>
+<li>地址写好之后，驱动继续写入命令 ID 和必要的控制位，相当于按下门铃触发请求。</li>
+<li>PSP 硬件检测到这些寄存器状态发生变化后，会拉起面向 PSP 内核的中断线，固件进入通用中断处理流程，读取并识别命令 ID，然后跳转到对应的命令处理函数执行。</li>
+<li>接下来 PSP 作为总线主设备发起 DMA，主动到主机 RAM 读取刚才那段明文缓冲区，完成计算后把结果（例如密文或摘要）写回到同一块或约定的返回缓冲区。</li>
+<li>处理结束后，PSP 再通过发出 MSI-X 中断通知 x86 侧中断控制器，最后由 x86 内核调度执行 CCP 驱动事先注册的完成回调，把硬件返回的结果取走并向上层交付。</li>
 </ul>
 
                 
