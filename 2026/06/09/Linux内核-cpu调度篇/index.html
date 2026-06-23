@@ -19,24 +19,22 @@
   <meta name="author" content="5Y2z">
   <meta name="keywords" content="">
   
-    <meta name="description" content="小菜鸡的内核之旅？好吧一直都是想起来才学(鸭鸭梨可爱捏)">
+    <meta name="description" content="CPU调度 CPU的上下文切换 上下文切换的概念：如今的OS几乎都支持&quot;同时&quot;运行远大于CPU数量的任务，OS会将CPU轮流分配给它们使用。这就要求OS必须知道从哪里加载任务，以及加载后从哪里开始运行，而这些信息都保存在CPU的寄存器中，其中即将执行的下一条指令的地址被保存在程序计数器（PC）这一特殊寄存器上。我们将寄存器的这些信息称为CPU的上下文，也叫硬件上下文。 OS在切">
 <meta property="og:type" content="article">
-<meta property="og:title" content="linux内核学习">
-<meta property="og:url" content="http://yzsandw.com/2025/11/13/linux%E5%86%85%E6%A0%B8%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:title" content="Linux内核(cpu调度篇)">
+<meta property="og:url" content="http://yzsandw.com/2026/06/09/Linux%E5%86%85%E6%A0%B8-cpu%E8%B0%83%E5%BA%A6%E7%AF%87/index.html">
 <meta property="og:site_name" content="5Y2z_blog">
-<meta property="og:description" content="小菜鸡的内核之旅？好吧一直都是想起来才学(鸭鸭梨可爱捏)">
+<meta property="og:description" content="CPU调度 CPU的上下文切换 上下文切换的概念：如今的OS几乎都支持&quot;同时&quot;运行远大于CPU数量的任务，OS会将CPU轮流分配给它们使用。这就要求OS必须知道从哪里加载任务，以及加载后从哪里开始运行，而这些信息都保存在CPU的寄存器中，其中即将执行的下一条指令的地址被保存在程序计数器（PC）这一特殊寄存器上。我们将寄存器的这些信息称为CPU的上下文，也叫硬件上下文。 OS在切">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/Warframe0011.jpg">
-<meta property="article:published_time" content="2025-11-13T07:52:49.000Z">
-<meta property="article:modified_time" content="2026-04-08T01:42:51.479Z">
+<meta property="article:published_time" content="2026-06-09T06:46:55.000Z">
+<meta property="article:modified_time" content="2026-06-09T06:47:30.244Z">
 <meta property="article:author" content="5Y2z">
-<meta property="article:tag" content="kernel">
+<meta property="article:tag" content="Linux kernel">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/Warframe0011.jpg">
   
   
   
-  <title>linux内核学习 - 5Y2z_blog</title>
+  <title>Linux内核(cpu调度篇) - 5Y2z_blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -207,13 +205,13 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/Warframe0011.jpg') no-repeat center center; background-size: cover;">
+     style="background: url('/img/img1.jpg') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="linux内核学习"></span>
+            <span id="subtitle" data-typed-text="Linux内核(cpu调度篇)"></span>
           
         </div>
 
@@ -224,8 +222,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-11-13 15:52" pubdate>
-          2025年11月13日 下午
+        <time datetime="2026-06-09 14:46" pubdate>
+          2026年6月9日 下午
         </time>
       </span>
     
@@ -236,7 +234,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3.5k 字
+          1.6k 字
         
       </span>
     
@@ -247,7 +245,7 @@
         
         
         
-          30 分钟
+          14 分钟
         
       </span>
     
@@ -284,132 +282,12 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">linux内核学习</h1>
+            <h1 id="seo-header">Linux内核(cpu调度篇)</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="内存管理">内存管理</h1>
-<h2 id="页">页</h2>
-<h3 id="页表项（PTE）">页表项（PTE）</h3>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20251113165506677.png" srcset="/img/loading.gif" lazyload alt="image-20251113165506677"></p>
-<p>拆解后分两部分：</p>
-<h4 id="1-PFN（物理页号）">(1) PFN（物理页号）</h4>
-<p>就是哪个物理页，存放在 PTE 的高 52 位（细节依赖 CPU）。</p>
-<p>物理地址 = PFN &lt;&lt; 12<br>
-（因为每页 4KB）</p>
-<h4 id="2-flag-bits（权限-状态位）">(2) flag bits（权限/状态位）</h4>
-<p>常见的标志位包括：</p>
-<table>
-<thead>
-<tr>
-<th>位</th>
-<th>名称</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>P</td>
-<td>Present</td>
-<td>是否在内存中</td>
-</tr>
-<tr>
-<td>R/W</td>
-<td>可写</td>
-<td>是否允许写</td>
-</tr>
-<tr>
-<td>U/S</td>
-<td>用户态/内核态</td>
-<td>是否允许用户态访问</td>
-</tr>
-<tr>
-<td>NX</td>
-<td>Non-Execute</td>
-<td>是否禁止执行</td>
-</tr>
-<tr>
-<td>A</td>
-<td>Accessed</td>
-<td>是否被访问</td>
-</tr>
-<tr>
-<td>D</td>
-<td>Dirty</td>
-<td>是否被写过</td>
-</tr>
-<tr>
-<td>PAT</td>
-<td>caching mode</td>
-<td>缓存策略</td>
-</tr>
-<tr>
-<td>Global</td>
-<td>全局页</td>
-<td>TLB 不会在切换 CR3 时刷新</td>
-</tr>
-<tr>
-<td>COW</td>
-<td><em>Linux软件层标志</em></td>
-<td>写时复制，内核组织在更高层 meta 信息</td>
-</tr>
-</tbody>
-</table>
-<p><strong>这些位让 CPU 知道如何处理对该页的内存访问。</strong></p>
-<p>例：<br>
-PTE 中 R/W=0 → 页只读<br>
-PTE 中 NX=1 → 页不可执行<br>
-PTE 中 Present=0 → 页不在内存，引发 page fault，从 swap/load-in 再填充页表</p>
-<h3 id="反向映射-RMAP-技术">反向映射(RMAP)技术</h3>
-<h4 id="基本概念">基本概念</h4>
-<ul>
-<li>
-<p><strong>正向映射</strong></p>
-<p>当进程分配内存并发生写操作时，会分配虚拟地址并产生缺页,进而分配物理内存并建立虚拟地址到物理地址的映射关系， 这个叫正向映射。</p>
-</li>
-<li>
-<p><strong>反向映射</strong></p>
-<p>反过来， 通过物理页面找到映射它的所有虚拟页面叫反向映射（reverse-mapping, RMAP）。</p>
-</li>
-</ul>
-<blockquote>
-<p>为什么需要反向映射？ 主要是为了内存回收。在操作系统中，多个进程的虚拟地址可能映射到同一个物理页（例如共享内存、写时复制等）。当内核需要回收一个物理页时，它必须修改所有映射了该页的页表项，使其无效或指向其他位置。如果没有反向映射，内核将不得不遍历所有进程的页表来寻找映射，这是极其低效的。</p>
-</blockquote>
-<p><strong>Linux2.4没有反向映射</strong><br>
-在linux2.4内核中没有反向映射的这个概念，当时为了找到一个物理页面对应的页表项就需要遍历系统中所有的mm组成的链表，然后再遍历每一个mm的每一个vma看这个vma是否映射了这页，这个过程相当低效，最坏情况不得不遍历完所有的mm然后才能找映射到这个页的所有pte。</p>
-<h2 id="伙伴系统和slab分配器">伙伴系统和slab分配器</h2>
-<p>在现代操作系统中，内存管理是支撑系统运行的核心支柱之一。它不仅决定了资源利用的效率，还直接影响性能、稳定性和应用程序的体验。在 Linux 内核中，内存管理通过分层设计实现了高效与灵活的平衡，其中 <strong>伙伴系统（Buddy System）</strong> 是物理内存分配的基础机制。无论是用户态程序通过 <code>malloc()</code> 请求内存，还是内核态创建进程描述符、分配文件缓冲区，背后都离不开伙伴系统的支持。</p>
-<h3 id="伙伴系统">伙伴系统</h3>
-<p>Linux内核中使用伙伴系统(buddy system)来分配以页为单位的内存。</p>
-<p>首先我们来说一下使用伙伴系统的原因，也就是解释一下内存分配时的内存碎片问题。内存碎片即“碎片的内存”，它分为<strong>外碎片</strong>和<strong>内碎片</strong>，内存碎片描述一个系统中所有不可用的空闲内存，这些碎片之所以不能被使用，是因为负责动态分配内存的分配算法使得这些空闲的内存无法使用，这一问题的发生，原因在于这些空闲内存小且以不连续方式出现在不同的位置。因此这个问题的或大或小取决于内存管理算法的实现上。</p>
-<p><strong>外碎片</strong></p>
-<p>外部碎片指的是还没有被分配出去（不属于任何进程），但由于太小了无法分配给申请内存空间的新进程的内存空闲区域。</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20251224112002335.png" srcset="/img/loading.gif" lazyload alt="image-20251224112002335"></p>
-<p><strong>内碎片</strong></p>
-<p>内部碎片就是已经被分配出去（能明确指出属于哪个进程）却不能被进程利用的内存空间。也就是分配给进程的内存空间过大，进程原本不需要这么多内存。</p>
-<p><img src="https://yzsandwimages.oss-cn-beijing.aliyuncs.com/img/image-20251224112406247.png" srcset="/img/loading.gif" lazyload alt="image-20251224112406247"></p>
-<h3 id="slab分配器">slab分配器</h3>
-<h2 id="内存回收">内存回收</h2>
-<h3 id="内存回收的方式">内存回收的方式</h3>
-<p>需要注意的是，我们这里提到的内存回收指的物理内存管理的逻辑。</p>
-<p>1.直接内存回收：在编程语言或操作系统级别手动回收不再使用的内存资源。在编程语言中，就像用户程序通过free函数释放曾经通过malloc函数分配的内存一样。在操作系统层面，直接内存回收通常由垃圾回收器（Garbage Collector）来完成。垃圾回收器会自动检测并回收不再使用的对象所占用的内存空间，以减少内存泄漏和资源浪费。</p>
-<p>2.定期扫描回收（kswapd）：定期扫描回收（kswapd）是Linux内核中的一个守护进程，用于管理系统内存和交换空间。它负责检查当前内存使用情况，并在需要时进行页面回收或交换页面到磁盘上的交换分区。</p>
-<p>3.OOM机制（out of memory）：OOM机制是在内存不足时，内核使用了kswapd回收内存后仍然不够分配内存，就会触发OOM机制强制杀死占用内存最多的程序</p>
-<h3 id="定期扫描回收（kswapd）">定期扫描回收（kswapd）</h3>
-<p>kswapd 是一个内核线程，在内存不足时负责在后台进行内存回收，这个过程发生在后台，因此是异步发生，不会阻塞进程。</p>
-<p>内核对内存的容量设置了三个阈值：</p>
-<ul>
-<li>页最小阈值（pages_min）</li>
-<li>页低阈值（pages_low）</li>
-<li>页高阈值（pages_high）</li>
-</ul>
-<p>当内存大于 <strong>pages_high</strong> 时，表示此时系统内存足够，不会进行内存回收。</p>
-<p>当内存小于 <strong>pages_low</strong> 时，表示此时内存存在压力，会触发 kswapd0 进行后台内存回收，<strong>直到 pages_high 为止</strong>。</p>
-<p>当内存小于 <strong>pages_min</strong> 时，表示此时用户内存耗尽，会触发直接内存回收，进程被阻塞。</p>
-<h3 id="直接内存回收">直接内存回收</h3>
-<h3 id="OOM">OOM</h3>
-<h1 id="CPU调度">CPU调度</h1>
+                <h1 id="CPU调度">CPU调度</h1>
 <h2 id="CPU的上下文切换">CPU的上下文切换</h2>
 <p><strong>上下文切换的概念</strong>：如今的OS几乎都支持&quot;同时&quot;运行远大于CPU数量的任务，OS会将CPU轮流分配给它们使用。这就要求OS必须知道从哪里加载任务，以及加载后从哪里开始运行，而这些信息都保存在CPU的<strong>寄存器</strong>中，其中即将执行的下一条指令的地址被保存在<strong>程序计数器</strong>（PC）这一特殊寄存器上。<strong>我们将寄存器的这些信息称为CPU的上下文，也叫硬件上下文</strong>。</p>
 <p>OS在切换运行任务时，<strong>将上一任务的上下文保存下来，并将即将运行的任务的上下文加载到CPU寄存器上的这一动作，被称为CPU上下文切换</strong>。</p>
@@ -465,15 +343,6 @@ PTE 中 Present=0 → 页不在内存，引发 page fault，从 swap/load-in 再
 <h2 id="实时调度">实时调度</h2>
 <h2 id="多处理器调度">多处理器调度</h2>
 <h2 id="优先级反转现象">优先级反转现象</h2>
-<h1 id="操作系统I-O基础">操作系统I/O基础</h1>
-<p>在计算机操作系统中，I/O就是<strong>输入(Input)<strong>和</strong>输出(Output)</strong>，也可以理解为<strong>读（Read）和写（Write)</strong>，针对不同的对象，I/O模式可以划分为<strong>磁盘IO</strong>模型和<strong>网络IO</strong>模型。</p>
-<ul>
-<li><strong>读操作</strong>：操作系统会先从内核缓冲区中查找是否有用户态所需要的数据，如果有就直接从内核缓冲区copy到用户缓冲区，供用户的应用程序使用。如果没有，对于磁盘I/O来说直接从磁盘中读取到内核缓冲区。而对于网络I/O，应用程序需要等待客户端发送数据，如果客户端还没有发送数据，对应的应用程序将会被阻塞，直到客户端发送了数据，该应用程序才会被唤醒，从Socket协议找中读取客户端发送的数据到内核空间，然后把内核空间的数据copy到用户空间，供应用程序使用。</li>
-<li><strong>写操作</strong>：用户的应用程序将数据从用户空间copy到内核空间的缓冲区中（如果用户空间没有相应的数据，则需要从磁盘—&gt;内核缓冲区—&gt;用户缓冲区依次读取），这时对用户程序来说写操作就已经完成，至于什么时候再写到磁盘或通过网络发送出去，由操作系统决定。除非应用程序显示地调用了sync 命令，立即把数据写入磁盘，或执行flush()方法，通过网络把数据发送出去。</li>
-</ul>
-<h2 id="PIO">PIO</h2>
-<h1 id="Reference">Reference</h1>
-<p><a target="_blank" rel="noopener" href="https://www.nowcoder.com/discuss/544284985797169152">『面试问答』：什么是内存碎片？如何减少内存碎片？_牛客网</a></p>
 
                 
               </div>
@@ -486,7 +355,7 @@ PTE 中 Present=0 → 页不在内存，引发 page fault，从 swap/load-in 再
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/kernel/" class="print-no-link">#kernel</a>
+        <a href="/tags/Linux-kernel/" class="print-no-link">#Linux kernel</a>
       
     </div>
   
@@ -498,8 +367,8 @@ PTE 中 Present=0 → 页不在内存，引发 page fault，从 swap/load-in 再
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>linux内核学习</div>
-      <div>http://yzsandw.com/2025/11/13/linux内核学习/</div>
+      <div>Linux内核(cpu调度篇)</div>
+      <div>http://yzsandw.com/2026/06/09/Linux内核-cpu调度篇/</div>
     </div>
     <div class="license-meta">
       
@@ -511,7 +380,7 @@ PTE 中 Present=0 → 页不在内存，引发 page fault，从 swap/load-in 再
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年11月13日</div>
+          <div>2026年6月9日</div>
         </div>
       
       
@@ -543,18 +412,12 @@ PTE 中 Present=0 → 页不在内存，引发 page fault，从 swap/load-in 再
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/12/23/TSB-agent%E5%88%86%E6%9E%90/" title="TSB-agent分析">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">TSB-agent分析</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/10/17/%E8%99%9A%E6%8B%9F%E5%8F%AF%E4%BF%A1%E6%A0%B9%E5%AE%9E%E9%AA%8C/" title="虚拟可信根实验">
-                        <span class="hidden-mobile">虚拟可信根实验</span>
+                      <a href="/2026/06/09/Linux%E5%86%85%E6%A0%B8-IO%E7%AF%87/" title="Linux内核(IO篇)">
+                        <span class="hidden-mobile">Linux内核(IO篇)</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
